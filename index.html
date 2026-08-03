@@ -118,6 +118,15 @@
   .chip:hover{border-color:var(--navy-2);color:var(--navy-2);}
   .chip.active{background:var(--navy);border-color:var(--navy);color:#fff;}
   .chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+  .filter-label{
+    font-family:'Kanit',sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--mute);
+    display:flex;
+    align-items:center;
+    margin-right:2px;
+  }
   select#statusFilter{
     font-family:'Sarabun',sans-serif;
     font-size:13.5px;
@@ -139,6 +148,50 @@
   }
   .legend span{display:inline-flex;align-items:center;gap:6px;}
   .legend i{width:10px;height:10px;border-radius:3px;display:inline-block;}
+  .glossary-toggle{
+    cursor:pointer;
+    color:var(--navy-2);
+    font-weight:600;
+    text-decoration:underline;
+    text-underline-offset:2px;
+    margin-left:auto;
+  }
+  .glossary-toggle:hover{color:var(--orange);}
+  .glossary-panel{
+    max-width:1280px;
+    margin:10px auto 0;
+    padding:16px 32px 4px;
+  }
+  .glossary-panel{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px 24px;
+  }
+  @media (max-width:760px){.glossary-panel{grid-template-columns:1fr;}}
+  .g-col h4{
+    font-family:'Kanit',sans-serif;
+    font-size:13px;
+    color:var(--navy);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin:0 0 10px;
+  }
+  .g-item{display:flex;gap:10px;margin-bottom:10px;font-size:13.5px;line-height:1.55;}
+  .g-item .g-tag{
+    flex-shrink:0;
+    font-family:'Kanit',sans-serif;
+    font-size:11px;
+    font-weight:600;
+    color:#fff;
+    padding:3px 9px;
+    border-radius:6px;
+    height:fit-content;
+    white-space:nowrap;
+  }
   main{
     max-width:1280px;
     margin:0 auto;
@@ -197,6 +250,8 @@
     -webkit-box-orient:vertical;
     overflow:hidden;
   }
+  .recip-mini{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--mute);margin-top:-4px;}
+  .recip-mini i{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle;}
   .timeline{display:flex;flex-direction:column;gap:4px;}
   .months{display:flex;gap:2px;}
   .m{
@@ -360,6 +415,12 @@
   .gantt td.month-cell.current .bar{box-shadow:0 0 0 2px var(--navy) inset;}
   .gantt tbody tr:hover td:not(.name-cell){background:#F6F8FA;}
   .gantt tbody tr:hover td.name-cell{background:#F6F8FA;}
+  .gantt-row{cursor:pointer;}
+  .gantt-row.expanded-row td{background:#EAF1F8;}
+  .gantt-row.expanded-row td.name-cell{background:#EAF1F8;}
+  .gexpand-hint{margin-left:auto;color:var(--navy-2);font-weight:600;}
+  .gname-status{justify-content:flex-start;}
+  .gantt-detail-row td{background:#FAFBFC;padding:18px 24px;border-bottom:1px solid var(--border);}
   .view{display:none;}
   .view.active{display:block;}
 </style>
@@ -393,6 +454,7 @@
     </select>
   </div>
   <div class="row" id="groupChips"></div>
+  <div class="row" id="recipChips" style="margin-top:8px;"></div>
 </div>
 
 <div class="legend">
@@ -402,6 +464,18 @@
   <span><i style="background:var(--gray)"></i> ผ่านช่วงดำเนินการแล้ว</span>
   <span><i style="background:var(--green)"></i> ดำเนินการต่อเนื่องตลอดปี</span>
   <span>▲ = เดือนปัจจุบัน</span>
+  <span class="glossary-toggle" id="glossaryToggle">ℹ️ คำนิยาม / ชื่อเต็มกลุ่มงาน</span>
+</div>
+
+<div class="glossary-panel" id="glossaryPanel" style="display:none;">
+  <div class="g-col">
+    <h4>กลุ่มงานหลัก (ชื่อเต็ม)</h4>
+    <div id="glossaryGroups"></div>
+  </div>
+  <div class="g-col">
+    <h4>ผู้รับบริการ (นิยาม)</h4>
+    <div id="glossaryRecip"></div>
+  </div>
 </div>
 
 <main>
@@ -441,11 +515,23 @@
 const ITEMS = [{"no": 1, "desc": "การสื่อสาร/การขับเคลื่อนแผนกลยุทธ์ มจธ. ฉบับที่ 13", "tags": ["PLAN"], "active": [true, true, true, false, false, false, false, false, false, false, false, false], "note": "สื่อสารแผนกลยุทธ์ฉบับที่ 13 สู่หน่วยงาน ต้นปีงบประมาณ (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 2, "desc": "การจัดทำแผนปฏิบัติการ (Implementation Plan) ตามแผนกลยุทธ์ มจธ. ฉบับที่ 13", "tags": ["PLAN"], "active": [false, false, true, true, true, true, false, false, false, false, false, false], "note": "สื่อสารและจัดทำแผนปฏิบัติการ Implementation/Action Planประจำปี 1+2", "recip": ["หน่วยงาน"]}, {"no": 3, "desc": "การจัดทำข้อตกลงการปฏิบัติงานระดับหน่วยงาน (Performance Agreement, PA)", "tags": ["STG", "PLAN", "BUDGET", "Research", "RISK"], "active": [false, false, true, true, false, false, false, false, false, false, false, false], "note": "สื่อสารและจัดทำข้อตกลงการปฏิบัติงาน (PA) ระดับหน่วยงาน ประจำปี", "recip": ["หน่วยงาน"]}, {"no": 4, "desc": "การติดตามและประเมินผลการดำเนินงานตามแผนกลยุทธ์ ตามแผนกลยุทธ์ มจธ. ฉบับที่ 13", "tags": ["PLAN"], "active": [false, false, true, false, false, true, false, false, true, false, false, true], "note": "ประสานงานรับข้อมูลเพื่อจัดทำรายงานสภา ทุกไตรมาส", "recip": ["หน่วยงาน"]}, {"no": 5, "desc": "การสร้างความเข้าใจเกี่ยวกับแนวทางและวิธีการจัดทำแผนการดำเนินงาน และงบประมาณล่วงหน้าระยะปานกลาง (1+2)", "tags": ["PLAN", "BUDGET"], "active": [false, false, true, true, true, true, false, false, false, false, false, false], "note": "", "recip": ["บุคลากร", "หน่วยงาน"]}, {"no": 6, "desc": "แผนการรับนักศึกษา เข้าใหม่ ทั้งหมด และผู้สำเร็จการศึกษา", "tags": ["PLAN"], "active": [true, true, false, false, false, false, false, false, false, false, false, false], "note": "รวบรวม เผยแพร่แผนเพื่อประกอบการจัดทำงบประมาณ ประจำปี", "recip": ["หน่วยงาน", "บุคคลภายนอก"]}, {"no": 7, "desc": "แผนโครงการตามภารกิจ (Agenda Based) หรือโครงการตามนโยบายภาครัฐ อาทิ โครงการผลิตบัณฑิตพันธุ์ใหม่ / Reinventing University System / โครงการสำคัญ / โครงการภายใต้แผนพัฒนาภาค โครงการตามแผนงานบูรณาการต่าง ๆ", "tags": ["PLAN", "BUDGET"], "active": [false, true, true, true, false, false, false, false, false, false, false, false], "note": "รวบรวมข้อเสนอโครงการ Agenda Based ประกอบคำของบประมาณ (ร่าง)", "recip": ["หน่วยงาน", "บุคคลภายนอก"]}, {"no": 8, "desc": "แผนการจัดตั้งหน่วยงานใหม่ / การปรับโครงสร้างหน่วยงาน", "tags": ["PLAN"], "active": [false, false, false, false, false, false, false, true, true, true, false, false], "note": "เสนอแผนจัดตั้ง/ปรับโครงสร้างหน่วยงาน ตามรอบเสนอสภา (ไม่มีรอบตายตัว - ร่าง)", "recip": ["หน่วยงาน", "บุคคลภายนอก"]}, {"no": 9, "desc": "แผนการบริหารความเสี่ยง (Risk Management)", "tags": ["RISK"], "active": [false, false, true, false, false, true, false, false, true, false, false, true], "note": "ประสานงานรับข้อมูลเพื่อรายงาน RMC ทุกไตรมาส / รายงานสภาทุก 6 เดือน", "recip": ["บุคลากร", "หน่วยงาน"]}, {"no": 10, "desc": "การใช้ระบบบริหารความเสี่ยง (Risk Management System, RMS.)", "tags": ["RISK"], "active": [false, false, true, false, false, false, false, false, true, false, true, false], "note": "หน่วยงานนำส่งข้อมูลในระบบ RMS. /ให้ความเห็น ผลรอบ 6/12 เดือน ", "recip": ["บุคลากร", "หน่วยงาน"]}, {"no": 11, "desc": "KMUTT Strategy Diagnosis", "tags": ["STG", "PLAN", "BUDGET", "Research", "RISK"], "active": [false, false, false, false, true, true, true, false, false, false, false, false], "note": "การจัดทำข้อมูลและกำหนดการประชุมระหว่างผู้บริหาร ม. + หน่วยงาน", "recip": ["หน่วยงาน"]}, {"no": 12, "desc": "การจัดทำคำของบประมาณแผ่นดินประจำปี (งบลงทุน)", "tags": ["BUDGET"], "active": [true, true, false, false, false, false, false, false, false, false, false, true], "note": "จัดทำและนำส่งคำของบประมาณลงทุนต่อสำนักงบประมาณ (ร่าง)", "recip": ["หน่วยงาน"]}, {"no": 13, "desc": "แผนงบประมาณลงทุนเชิงยุทธศาสตร์ระยะ 5 ปี (Strategic Investment Plan)", "tags": ["PLAN", "BUDGET"], "active": [true, true, false, false, false, false, false, false, false, false, false, true], "note": "ทบทวน/ปรับปรุงแผนงบลงทุนเชิงยุทธศาสตร์ระยะ 5 ปี (ร่าง)", "recip": ["หน่วยงาน"]}, {"no": 14, "desc": "การสนับสนุนข้อมูลเพื่อจัดทำคำของบประมาณประจำปี (แบบ 1+2)", "tags": ["PLAN", "BUDGET"], "active": [false, false, true, true, true, true, false, false, false, false, false, false], "note": "", "recip": ["หน่วยงาน", "บุคคลภายนอก"]}, {"no": 15, "desc": "การวิเคราะห์งบประมาณโครงการต่าง ๆ อาทิ งบประมาณหลักสูตรปรับปรุง-ใหม่ การปรับค่าเล่าเรียน การศึกษาดูงานต่างประเทศ การลงทุนโครงการใหม่ การขออนุมัติโครงการที่ขอใช้เงินสะสมหน่วยงาน/มหาวิทยาลัย", "tags": ["BUDGET"], "active": [true, true, true, true, true, true, true, true, true, true, true, true], "note": "วิเคราะห์งบประมาณตามคำขอที่ยื่นเข้ามา ต่อเนื่องตลอดปี (ร่าง)", "recip": ["หน่วยงาน"]}, {"no": 16, "desc": "การปรับแผนการดำเนินงานและงบประมาณรายจ่ายประจำปีงบประมาณ", "tags": ["BUDGET"], "active": [false, true, true, true, false, false, false, false, false, false, false, false], "note": "รอบปรับแผนดำเนินงาน/งบประมาณรายจ่ายกลางปีงบประมาณ (ร่าง)", "recip": ["หน่วยงาน", "บุคคลภายนอก"]}, {"no": 17, "desc": "การบริหารงบประมาณแบบมุ่งเน้นผลงาน (Performance Based Budgeting System; PBBS)", "tags": ["BUDGET"], "active": [true, false, false, true, false, false, true, false, false, true, false, false], "note": "ติดตามผลบริหารงบประมาณแบบมุ่งเน้นผลงาน รายไตรมาส (ร่าง)", "recip": ["หน่วยงาน"]}, {"no": 18, "desc": "การขอกรอบอัตรากำลังพนักงานมหาวิทยาลัย/การขออนุมัติการจ้างผู้มีความรู้ความสามารถพิเศษปฏิบัติงานในมหาวิทยาลัย", "tags": ["PLAN", "BUDGET"], "active": [true, false, false, false, false, false, false, false, false, false, true, true], "note": "ยื่นขอกรอบอัตรากำลัง/อนุมัติจ้างฯ รอบต้นปีงบประมาณ (ร่าง)", "recip": ["หน่วยงาน"]}, {"no": 19, "desc": "การใช้ระบบบริหารงบประมาณ e-Budgeting", "tags": ["BUDGET"], "active": [true, true, true, true, true, true, true, true, true, true, true, true], "note": "ใช้งานระบบ e-Budgeting ต่อเนื่องตลอดปี (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน"]}, {"no": 20, "desc": "หนังสือสารสนเทศประจำปี ", "tags": ["Research"], "active": [false, false, false, false, false, false, false, false, false, true, true, true], "note": "รวบรวม-จัดพิมพ์หนังสือสารสนเทศประจำปี หลังปิดปีงบประมาณ (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน"]}, {"no": 21, "desc": "ข้อมูลและสถิติของมหาวิทยาลัย (Fact and Figures of University)", "tags": ["Research"], "active": [false, false, false, false, false, false, false, false, false, true, true, true], "note": "จัดทำข้อมูลและสถิติของมหาวิทยาลัยประจำปี (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 22, "desc": "รายงานประจำปี", "tags": ["Research"], "active": [true, false, false, false, false, false, false, false, false, false, true, true], "note": "จัดทำรายงานประจำปี หลังปิดปีงบประมาณ (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 23, "desc": "รายงานมหาวิทยาลัยที่ดี (Good University Report)", "tags": ["Research"], "active": [true, false, false, false, false, false, false, false, false, false, true, true], "note": "จัดทำรายงานมหาวิทยาลัยที่ดี (Good University Report) (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 24, "desc": "ข้อมูลการสำรวจภาวะการมีงานทำของบัณฑิต มจธ. ", "tags": ["Research"], "active": [false, false, false, false, false, true, true, true, false, false, false, false], "note": "สำรวจภาวะการมีงานทำของบัณฑิต หลังสำเร็จการศึกษา ~1 ปี (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 25, "desc": "ข้อมูลการสำรวจความพึงพอใจของผู้ใช้บัณฑิต มจธ.", "tags": ["Research"], "active": [false, false, false, false, false, true, true, true, false, false, false, false], "note": "สำรวจความพึงพอใจของผู้ใช้บัณฑิต มจธ. (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 26, "desc": "ข้อมูลสรุปผลการจัดอันดับ (Ranking) ของ มจธ.", "tags": ["Research"], "active": [false, false, false, false, false, true, false, true, true, true, false, false], "note": "ติดตาม/สรุปผลการจัดอันดับ (QS, THE, ARWU ฯลฯ) ตามรอบประกาศผล (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 27, "desc": "หนังสือแนวโน้มพัฒนาการของ มจธ. (Trend)", "tags": ["Research"], "active": [false, false, false, false, false, false, false, false, false, false, true, true], "note": "จัดทำหนังสือแนวโน้มพัฒนาการของ มจธ. (Trend) ประจำปี (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 28, "desc": "ข้อมูลแสดงผลการดำเนินงาน (Dashboard - Operation) (ด้านบุคลากร และนักศึกษา)", "tags": ["Research"], "active": [true, true, true, true, true, true, true, true, true, true, true, true], "note": "ปรับปรุงข้อมูล Dashboard ด้านบุคลากรและนักศึกษา ต่อเนื่องรายเดือน (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 29, "desc": "ข้อมูล Dashboard – K-STG Strategy, Transformation & Goal อาทิ ด้าน Strategy / แผน-ผล นักศึกษา / ข้อมูลงบประมาณ / Performance / Potential", "tags": ["STG", "PLAN", "BUDGET", "Research", "RISK"], "active": [true, true, true, true, true, true, true, true, true, true, true, true], "note": "ปรับปรุงข้อมูล Dashboard K-STG ต่อเนื่องรายเดือน (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}];
 
 const GROUP_META = {
-  STG:     {color:'#0B2A4A', label:'STG',      team:'ทีมยุทธศาสตร์ (STG)'},
-  PLAN:    {color:'#2E7D5B', label:'PLAN',     team:'ทีมแผนงาน (PLAN)'},
-  BUDGET:  {color:'#3B6FA0', label:'BUDGET',   team:'ทีมงบประมาณ (BUDGET)'},
-  Research:{color:'#8452A3', label:'Research',team:'ทีมสถาบันวิจัยและข้อมูล (Research)'},
-  RISK:    {color:'#C0392B', label:'RISK',     team:'ทีมบริหารความเสี่ยง (RISK)'}
+  STG:     {color:'#0B2A4A', label:'STG',      team:'ทีมยุทธศาสตร์ (STG)',      full:'ภาพรวมทั้งสำนักงานยุทธศาสตร์ — หมายถึงทุกกลุ่มงานร่วมกัน'},
+  PLAN:    {color:'#2E7D5B', label:'PLAN',     team:'ทีมแผน (PLAN)',            full:'กลุ่มงานแผนและการจัดการยุทธศาสตร์'},
+  BUDGET:  {color:'#3B6FA0', label:'BUDGET',   team:'ทีมงบประมาณ (BUDGET)',     full:'กลุ่มงานงบประมาณและการจัดสรรทรัพยากร'},
+  Research:{color:'#8452A3', label:'Research',team:'ทีมสถาบันวิจัย (Research)', full:'กลุ่มงานวิจัยสถาบันและสารสนเทศ'},
+  RISK:    {color:'#C0392B', label:'RISK',     team:'ทีมบริหารความเสี่ยง (RISK)',full:'กลุ่มงานบริหารความเสี่ยง'}
+};
+
+const RECIP_META = {
+  'บุคลากร':'#2E7D5B',
+  'หน่วยงาน':'#B8710E',
+  'บุคคลภายนอก':'#3B6FA0'
+};
+
+const RECIP_DEFS = {
+  'บุคลากร':'บุคลากรสายวิชาการ (อาจารย์ / นักวิจัย) และบุคลากรสายวิชาชีพอื่น ๆ',
+  'หน่วยงาน':'ผู้แทนหน่วยงาน ผู้บริหารคณะ/สำนัก/สถาบัน และหน่วยงานในกำกับ คณะกรรมการของหน่วยงาน และผู้บริหารมหาวิทยาลัย',
+  'บุคคลภายนอก':'กระทรวงเจ้าสังกัด หน่วยงานภายนอกที่เกี่ยวข้อง และบุคคลทั่วไป/ผู้ปกครองนักศึกษา/ศิษย์เก่า'
 };
 
 const MONTH_NAMES = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -547,9 +633,16 @@ function deadlineText(item, st){
   };
 }
 
+function personIcon(color){
+  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="${color}" style="vertical-align:-1px;margin-right:4px;flex-shrink:0;"><path d="M12 12.5c2.9 0 5.2-2.3 5.2-5.2S14.9 2 12 2 6.8 4.4 6.8 7.3s2.3 5.2 5.2 5.2zm0 2.6c-3.6 0-10.7 1.8-10.7 5.4V23h21.4v-2.5c0-3.6-7.1-5.4-10.7-5.4z"/></svg>`;
+}
+function clockIcon(color){
+  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:5px;flex-shrink:0;"><circle cx="12" cy="12" r="9.2"/><path d="M12 7v5.2l3.4 2"/></svg>`;
+}
+
 function tagPill(tag){
   const meta = GROUP_META[tag] || {color:'#999',label:tag};
-  return `<span class="tag" style="background:${meta.color}">${meta.label}</span>`;
+  return `<span class="tag" style="background:${meta.color}" title="${meta.full||''}">${meta.label}</span>`;
 }
 
 let expandedNo = null;
@@ -558,12 +651,14 @@ let currentTab = 'cards';
 function getFiltered(){
   const q = document.getElementById('searchBox').value.trim().toLowerCase();
   const activeGroup = document.querySelector('.chip.group.active')?.dataset.group || 'all';
+  const activeRecip = document.querySelector('.chip.recip.active')?.dataset.recip || 'all';
   const statusVal = document.getElementById('statusFilter').value;
   const out = [];
   ITEMS.forEach(item=>{
     const st = computeStatus(item);
     if(q && !item.desc.toLowerCase().includes(q) && !item.note.toLowerCase().includes(q)) return;
     if(activeGroup!=='all' && !item.tags.includes(activeGroup)) return;
+    if(activeRecip!=='all' && !item.recip.includes(activeRecip)) return;
     if(statusVal!=='all' && st.key!==statusVal) return;
     out.push({item, st});
   });
@@ -579,16 +674,53 @@ function buildGantt(filtered){
       if(i===CUR_M) cls.push('current');
       return `<td class="${cls.join(' ')}"><div class="bar"></div></td>`;
     }).join('');
-    return `<tr>
+    const isExp = expandedNo===item.no;
+    let html = `<tr class="gantt-row${isExp?' expanded-row':''}" data-no="${item.no}">
       <td class="name-cell">
         <div class="gname-top"><span class="no-badge small">#${String(item.no).padStart(2,'0')}</span>${item.tags.map(tagPill).join('')}</div>
         <div class="gname-title">${item.desc}</div>
-        <div class="gname-status"><i style="background:${STATUS_COLORS[st.key]}"></i>${st.label}</div>
+        <div class="recip-mini">${item.recip.map(r=>`<span title="${RECIP_DEFS[r]||''}">${personIcon(RECIP_META[r]||'#999')}${r}</span>`).join('')}</div>
+        <div class="gname-status">${clockIcon(STATUS_COLORS[st.key])}${st.label}<span class="gexpand-hint">${isExp?'ย่อกลับ ▲':'ดูรายละเอียด ▼'}</span></div>
       </td>
       ${cells}
     </tr>`;
+
+    if(isExp){
+      const dl = deadlineText(item, st);
+      const teams = item.tags.map(t=>({label:GROUP_META[t]?.team || t, full:GROUP_META[t]?.full || ''}));
+      html += `<tr class="gantt-detail-row"><td colspan="13">
+        <div class="details" style="border-top:none;margin-top:0;padding-top:0;">
+          <div class="d-block">
+            <h4>รายละเอียดบริการ</h4>
+            <p>${item.desc}</p>
+            <h4>ผู้รับบริการ</h4>
+            <div class="pill-row">${item.recip.map(r=>`<span class="pill" title="${RECIP_DEFS[r]||''}">${r}</span>`).join('')}</div>
+            <h4>ทีมที่รับผิดชอบ / ประสานงาน</h4>
+            <div class="pill-row">${teams.map(t=>`<span class="pill" title="${t.full}">${t.label}</span>`).join('')}</div>
+            ${item.note ? `<h4>สิ่งที่ต้องเตรียม / หมายเหตุ</h4><p>${item.note.replace(' (ร่าง)','')}</p>` : ''}
+            ${item.note && item.note.includes('(ร่าง)') ? `<div class="draft-note">⚠ ช่วงเวลานี้เป็นข้อมูลร่างเบื้องต้น โปรดตรวจสอบกับเจ้าของภารกิจ</div>` : ''}
+          </div>
+          <div class="d-block">
+            <h4>กำหนดการ</h4>
+            <div class="info-line"><b>ควรเริ่มเตรียมการ</b><span>${dl.prep}</span></div>
+            <div class="info-line"><b>กำหนดการ/เส้นตาย</b><span>${dl.deadline}</span></div>
+            <h4 style="margin-top:14px;">ปฏิทินรายเดือน (${TODAY.getFullYear()+543})</h4>
+            <div class="full-months">${monthsBar(item.active,26)}${monthsLabels()}</div>
+          </div>
+        </div>
+      </td></tr>`;
+    }
+    return html;
   }).join('');
   document.getElementById('noResultsGantt').style.display = filtered.length===0 ? 'block' : 'none';
+
+  body.querySelectorAll('tr.gantt-row').forEach(tr=>{
+    tr.addEventListener('click', ()=>{
+      const no = parseInt(tr.dataset.no, 10);
+      expandedNo = expandedNo===no ? null : no;
+      render();
+    });
+  });
 }
 
 function render(){
@@ -603,7 +735,7 @@ function render(){
     const card = document.createElement('div');
     card.className = 'card' + (expandedNo===item.no ? ' expanded' : '');
     const dl = deadlineText(item, st);
-    const teams = item.tags.map(t=>GROUP_META[t]?.team || t);
+    const teams = item.tags.map(t=>({label:GROUP_META[t]?.team || t, full:GROUP_META[t]?.full || ''}));
 
     let inner = `
       <div class="card-head">
@@ -611,9 +743,10 @@ function render(){
         <div class="tags">${item.tags.map(tagPill).join('')}</div>
       </div>
       <div class="title">${item.desc}</div>
+      <div class="recip-mini">${item.recip.map(r=>`<span title="${RECIP_DEFS[r]||''}">${personIcon(RECIP_META[r]||'#999')}${r}</span>`).join('')}</div>
       <div class="timeline">${monthsBar(item.active)}</div>
       <div class="footer-row">
-        <span class="status-badge" style="background:${STATUS_DIM[st.key]};color:${STATUS_TEXT[st.key]}"><i style="background:${STATUS_COLORS[st.key]}"></i>${st.label}</span>
+        <span class="status-badge" style="background:${STATUS_DIM[st.key]};color:${STATUS_TEXT[st.key]}">${clockIcon(STATUS_COLORS[st.key])}${st.label}</span>
         <span class="expand-hint">${expandedNo===item.no ? 'ย่อกลับ ▲' : 'ดูรายละเอียด ▼'}</span>
       </div>`;
 
@@ -624,11 +757,11 @@ function render(){
           <h4>รายละเอียดบริการ</h4>
           <p>${item.desc}</p>
           <h4>ผู้รับบริการ</h4>
-          <div class="pill-row">${item.recip.map(r=>`<span class="pill">${r}</span>`).join('')}</div>
+          <div class="pill-row">${item.recip.map(r=>`<span class="pill" title="${RECIP_DEFS[r]||''}">${r}</span>`).join('')}</div>
           <h4>ทีมที่รับผิดชอบ / ประสานงาน</h4>
-          <div class="pill-row">${teams.map(t=>`<span class="pill">${t}</span>`).join('')}</div>
+          <div class="pill-row">${teams.map(t=>`<span class="pill" title="${t.full}">${t.label}</span>`).join('')}</div>
           ${item.note ? `<h4>สิ่งที่ต้องเตรียม / หมายเหตุ</h4><p>${item.note.replace(' (ร่าง)','')}</p>` : ''}
-          ${item.note && item.note.includes('(ร่าง)') ? `<div class="draft-note">⚠ ช่วงเวลานี้เป็นข้อมูลร่างเบื้องต้น ยังไม่ได้รับการยืนยันจากเจ้าของภารกิจ โปรดตรวจสอบก่อนใช้สื่อสารจริง</div>` : ''}
+          ${item.note && item.note.includes('(ร่าง)') ? `<div class="draft-note">⚠ ช่วงเวลานี้เป็นข้อมูลร่างเบื้องต้น โปรดตรวจสอบกับเจ้าของภารกิจ</div>` : ''}
         </div>
         <div class="d-block">
           <h4>กำหนดการ</h4>
@@ -656,6 +789,10 @@ function render(){
 
 // build group chips
 const groupBar = document.getElementById('groupChips');
+const groupLabel = document.createElement('div');
+groupLabel.className='filter-label';
+groupLabel.textContent='กลุ่มงานที่ให้บริการ:';
+groupBar.appendChild(groupLabel);
 const allChip = document.createElement('div');
 allChip.className='chip group active';
 allChip.dataset.group='all';
@@ -672,6 +809,32 @@ groupBar.addEventListener('click', (e)=>{
   const chip = e.target.closest('.chip.group');
   if(!chip) return;
   document.querySelectorAll('.chip.group').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  render();
+});
+
+// build recipient chips
+const recipBar = document.getElementById('recipChips');
+const recipLabel = document.createElement('div');
+recipLabel.className='filter-label';
+recipLabel.textContent='ผู้ได้รับบริการ:';
+recipBar.appendChild(recipLabel);
+const allRecipChip = document.createElement('div');
+allRecipChip.className='chip recip active';
+allRecipChip.dataset.recip='all';
+allRecipChip.textContent='ทั้งหมด';
+recipBar.appendChild(allRecipChip);
+Object.entries(RECIP_META).forEach(([key,color])=>{
+  const c = document.createElement('div');
+  c.className='chip recip';
+  c.dataset.recip=key;
+  c.innerHTML = `<span class="dot" style="background:${color}"></span>${key}`;
+  recipBar.appendChild(c);
+});
+recipBar.addEventListener('click', (e)=>{
+  const chip = e.target.closest('.chip.recip');
+  if(!chip) return;
+  document.querySelectorAll('.chip.recip').forEach(c=>c.classList.remove('active'));
   chip.classList.add('active');
   render();
 });
@@ -697,6 +860,21 @@ tabGanttBtn.addEventListener('click', ()=>{
 });
 
 document.getElementById('mh-'+CUR_M).classList.add('current-head');
+
+// populate glossary panel
+document.getElementById('glossaryGroups').innerHTML = Object.entries(GROUP_META).map(([key,meta])=>
+  `<div class="g-item"><span class="g-tag" style="background:${meta.color}">${meta.label}</span><span>${meta.full}</span></div>`
+).join('');
+document.getElementById('glossaryRecip').innerHTML = Object.entries(RECIP_DEFS).map(([key,def])=>
+  `<div class="g-item"><span class="g-tag" style="background:${RECIP_META[key]}">${key}</span><span>${def}</span></div>`
+).join('');
+const glossaryToggle = document.getElementById('glossaryToggle');
+const glossaryPanel = document.getElementById('glossaryPanel');
+glossaryToggle.addEventListener('click', ()=>{
+  const isOpen = glossaryPanel.style.display !== 'none';
+  glossaryPanel.style.display = isOpen ? 'none' : 'grid';
+  glossaryToggle.textContent = isOpen ? 'ℹ️ คำนิยาม / ชื่อเต็มกลุ่มงาน' : '✕ ปิดคำนิยาม';
+});
 
 render();
 </script>
