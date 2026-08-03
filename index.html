@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คลังบริการ | สำนักงานยุทธศาสตร์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2A4A;
+    --navy-2:#123A63;
+    --orange:#F8931D;
+    --orange-dim:#FDE3C0;
+    --amber:#B8710E;
+    --amber-dim:#F3DDBB;
+    --blue:#3B6FA0;
+    --blue-dim:#D9E5F0;
+    --gray:#8D96A3;
+    --gray-dim:#E7E9EC;
+    --green:#2E7D5B;
+    --green-dim:#D6EBE1;
+    --bg:#F4F6F8;
+    --card:#FFFFFF;
+    --border:#E1E5EA;
+    --text:#1D2733;
+    --mute:#69737F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Sarabun',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  header.top{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+    color:#fff;
+    padding:28px 32px 22px;
+    position:sticky;
+    top:0;
+    z-index:20;
+    box-shadow:0 4px 18px rgba(11,42,74,0.18);
+  }
+  .eyebrow{
+    font-family:'Kanit',sans-serif;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--orange);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Kanit',sans-serif;
+    font-size:26px;
+    font-weight:700;
+    margin:0 0 4px;
+  }
+  .sub{
+    font-size:14.5px;
+    color:#C8D3DE;
+    max-width:780px;
+    line-height:1.55;
+  }
+  .today-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-top:12px;
+    background:rgba(248,147,29,.16);
+    border:1px solid rgba(248,147,29,.5);
+    color:var(--orange);
+    font-size:13px;
+    font-weight:600;
+    padding:5px 12px;
+    border-radius:100px;
+  }
+  .toolbar{
+    max-width:1280px;
+    margin:0 auto;
+    padding:18px 32px 0;
+  }
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  .search{
+    flex:1 1 260px;
+    position:relative;
+  }
+  .search input{
+    width:100%;
+    padding:11px 14px 11px 38px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--card);
+    font-family:'Sarabun',sans-serif;
+    font-size:14.5px;
+    color:var(--text);
+    outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .search input:focus{border-color:var(--navy-2);box-shadow:0 0 0 3px rgba(18,58,99,.12);}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.45;}
+  .chip{
+    font-family:'Kanit',sans-serif;
+    font-size:13.5px;
+    font-weight:600;
+    padding:8px 16px;
+    border-radius:100px;
+    border:1px solid var(--border);
+    background:var(--card);
+    cursor:pointer;
+    color:var(--mute);
+    transition:all .15s;
+    user-select:none;
+    white-space:nowrap;
+  }
+  .chip:hover{border-color:var(--navy-2);color:var(--navy-2);}
+  .chip.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+  select#statusFilter{
+    font-family:'Sarabun',sans-serif;
+    font-size:13.5px;
+    padding:9px 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+  }
+  .legend{
+    max-width:1280px;
+    margin:14px auto 0;
+    padding:0 32px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    font-size:12.5px;
+    color:var(--mute);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block;}
+  main{
+    max-width:1280px;
+    margin:0 auto;
+    padding:20px 32px 60px;
+  }
+  #count{font-size:13px;color:var(--mute);margin-bottom:14px;}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(330px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px 18px 16px;
+    cursor:pointer;
+    transition:box-shadow .18s, border-color .18s, transform .12s;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .card:hover{box-shadow:0 8px 24px rgba(11,42,74,.10);border-color:#C9D3DD;transform:translateY(-1px);}
+  .card.expanded{grid-column:1 / -1;cursor:default;transform:none;}
+  .card.expanded:hover{transform:none;}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .no-badge{
+    font-family:'Kanit',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--navy);
+    background:var(--gray-dim);
+    border-radius:8px;
+    padding:3px 9px;
+    flex-shrink:0;
+  }
+  .tags{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;}
+  .tag{
+    font-family:'Kanit',sans-serif;
+    font-size:10.5px;
+    font-weight:600;
+    padding:3px 8px;
+    border-radius:6px;
+    color:#fff;
+    letter-spacing:.02em;
+  }
+  .title{
+    font-size:15.5px;
+    font-weight:600;
+    line-height:1.45;
+    color:var(--text);
+  }
+  .card:not(.expanded) .title{
+    display:-webkit-box;
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .timeline{display:flex;flex-direction:column;gap:4px;}
+  .months{display:flex;gap:2px;}
+  .m{
+    flex:1;
+    height:20px;
+    border-radius:4px;
+    background:#EEF1F4;
+    position:relative;
+  }
+  .m.q-edge{margin-right:4px;}
+  .m.active{background:var(--orange);}
+  .m.current::after{
+    content:'';
+    position:absolute;
+    top:-6px;left:50%;
+    transform:translateX(-50%);
+    width:0;height:0;
+    border-left:4px solid transparent;
+    border-right:4px solid transparent;
+    border-top:5px solid var(--navy);
+  }
+  .mlabels{display:flex;gap:2px;font-size:9px;color:var(--mute);font-family:'Kanit',sans-serif;}
+  .mlabels span{flex:1;text-align:center;}
+  .mlabels span.q-edge{margin-right:4px;}
+  .footer-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;}
+  .status-badge{
+    font-family:'Kanit',sans-serif;
+    font-size:12px;
+    font-weight:600;
+    padding:5px 11px;
+    border-radius:100px;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  .status-badge i{width:7px;height:7px;border-radius:50%;display:inline-block;}
+  .expand-hint{font-size:12px;color:var(--mute);}
+  .details{
+    border-top:1px dashed var(--border);
+    padding-top:14px;
+    margin-top:2px;
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    gap:22px;
+  }
+  @media (max-width:760px){.details{grid-template-columns:1fr;}}
+  .d-block h4{
+    font-family:'Kanit',sans-serif;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--mute);
+    margin:0 0 8px;
+    font-weight:600;
+  }
+  .d-block p{margin:0 0 10px;font-size:14px;line-height:1.6;color:var(--text);}
+  .pill-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+  .pill{
+    font-size:12.5px;
+    background:var(--gray-dim);
+    color:var(--navy-2);
+    padding:5px 11px;
+    border-radius:100px;
+    font-weight:500;
+  }
+  .info-line{display:flex;gap:8px;font-size:13.5px;margin-bottom:8px;line-height:1.5;}
+  .info-line b{font-weight:600;color:var(--navy);min-width:150px;flex-shrink:0;}
+  .full-months{display:flex;flex-direction:column;gap:5px;}
+  .full-months .months .m{height:26px;}
+  .draft-note{
+    font-size:12px;
+    color:var(--amber);
+    background:var(--amber-dim);
+    border-radius:8px;
+    padding:8px 11px;
+    margin-top:10px;
+    line-height:1.5;
+  }
+  .no-results{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--mute);
+    font-size:15px;
+  }
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:#C7CEDA;border-radius:10px;}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:14px;}
+  .tab-btn{
+    font-family:'Kanit',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    padding:9px 18px;
+    border-radius:10px 10px 0 0;
+    border:1px solid var(--border);
+    border-bottom:none;
+    background:#EAEDF1;
+    color:var(--mute);
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .tab-btn:hover{color:var(--navy-2);}
+  .tab-btn.active{background:var(--card);color:var(--navy);box-shadow:0 -2px 0 var(--orange) inset;}
+
+  /* Gantt table view */
+  .gantt-scroll{
+    overflow-x:auto;
+    border:1px solid var(--border);
+    border-radius:0 12px 12px 12px;
+    background:var(--card);
+  }
+  table.gantt{border-collapse:separate;border-spacing:0;width:100%;min-width:980px;}
+  .gantt thead th{
+    background:var(--navy-2);
+    color:#fff;
+    font-family:'Kanit',sans-serif;
+    font-size:11.5px;
+    font-weight:600;
+    text-align:center;
+    padding:9px 4px;
+    position:sticky;
+    top:0;
+    z-index:2;
+    border-bottom:1px solid rgba(255,255,255,.15);
+  }
+  .gantt thead tr.q-row th{background:var(--navy);font-size:12px;}
+  .gantt thead th.name-head{
+    text-align:left;
+    padding:10px 14px;
+    position:sticky;
+    left:0;
+    top:0;
+    z-index:4;
+    background:var(--navy);
+    min-width:300px;
+  }
+  .gantt thead th.month-head.current-head{background:var(--orange);color:#fff;}
+  .gantt tbody td{border-bottom:1px solid var(--border);}
+  .gantt tbody tr:last-child td{border-bottom:none;}
+  .gantt td.name-cell{
+    position:sticky;
+    left:0;
+    background:var(--card);
+    z-index:1;
+    padding:10px 14px;
+    min-width:300px;
+    max-width:340px;
+    border-right:1px solid var(--border);
+    vertical-align:top;
+  }
+  .gname-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
+  .no-badge.small{font-size:11px;padding:2px 7px;}
+  .gname-title{font-size:13.5px;font-weight:500;line-height:1.4;color:var(--text);margin-bottom:5px;}
+  .gname-status{font-size:11.5px;color:var(--mute);display:flex;align-items:center;gap:5px;}
+  .gname-status i{width:7px;height:7px;border-radius:50%;display:inline-block;}
+  .gantt td.month-cell{width:56px;text-align:center;padding:0;}
+  .gantt td.month-cell .bar{height:24px;margin:8px 5px;border-radius:5px;background:#EEF1F4;}
+  .gantt td.month-cell.active .bar{background:var(--orange);}
+  .gantt td.month-cell.current{background:rgba(11,42,74,.04);}
+  .gantt td.month-cell.current .bar{box-shadow:0 0 0 2px var(--navy) inset;}
+  .gantt tbody tr:hover td:not(.name-cell){background:#F6F8FA;}
+  .gantt tbody tr:hover td.name-cell{background:#F6F8FA;}
+  .view{display:none;}
+  .view.active{display:block;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="eyebrow">STG · Service Catalog</div>
+  <h1>คลังบริการ สำนักงานยุทธศาสตร์</h1>
+  <div class="sub">รวมภารกิจ/บริการทั้งหมด 29 รายการ พร้อมช่วงเวลาดำเนินการ กำหนดการ และทีมที่รับผิดชอบ — คลิกที่การ์ดเพื่อดูรายละเอียดแต่ละบริการ</div>
+  <div class="today-chip" id="todayChip">●</div>
+</header>
+
+<div class="toolbar">
+  <div class="tabs">
+    <button class="tab-btn active" id="tabCardsBtn">รายการบริการ</button>
+    <button class="tab-btn" id="tabGanttBtn">ภาพรวม Gantt (ทุกบริการ)</button>
+  </div>
+  <div class="row" style="margin-bottom:10px;">
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchBox" type="text" placeholder="ค้นหาบริการ เช่น งบประมาณ, PA, ความเสี่ยง...">
+    </div>
+    <select id="statusFilter">
+      <option value="all">สถานะทั้งหมด</option>
+      <option value="due">ถึงกำหนด/กำลังดำเนินการ</option>
+      <option value="prep">ควรเริ่มเตรียมการ</option>
+      <option value="upcoming">ยังไม่ถึงกำหนด</option>
+      <option value="passed">ผ่านช่วงดำเนินการแล้ว</option>
+      <option value="ongoing">ต่อเนื่องตลอดปี</option>
+    </select>
+  </div>
+  <div class="row" id="groupChips"></div>
+</div>
+
+<div class="legend">
+  <span><i style="background:var(--orange)"></i> ถึงกำหนด/กำลังดำเนินการ</span>
+  <span><i style="background:var(--amber)"></i> ควรเริ่มเตรียมการ (เดือนหน้า)</span>
+  <span><i style="background:var(--blue)"></i> ยังไม่ถึงกำหนด</span>
+  <span><i style="background:var(--gray)"></i> ผ่านช่วงดำเนินการแล้ว</span>
+  <span><i style="background:var(--green)"></i> ดำเนินการต่อเนื่องตลอดปี</span>
+  <span>▲ = เดือนปัจจุบัน</span>
+</div>
+
+<main>
+  <div id="count"></div>
+
+  <div class="view active" id="viewCards">
+    <div class="grid" id="grid"></div>
+    <div class="no-results" id="noResults" style="display:none;">ไม่พบบริการที่ตรงกับคำค้นหา/ตัวกรอง</div>
+  </div>
+
+  <div class="view" id="viewGantt">
+    <div class="gantt-scroll">
+      <table class="gantt">
+        <thead>
+          <tr class="q-row">
+            <th class="name-head" rowspan="2">บริการ / ภารกิจ (29 รายการ)</th>
+            <th colspan="3">ม.ค. – มี.ค.</th>
+            <th colspan="3">เม.ย. – มิ.ย.</th>
+            <th colspan="3">ก.ค. – ก.ย.</th>
+            <th colspan="3">ต.ค. – ธ.ค.</th>
+          </tr>
+          <tr>
+            <th class="month-head" id="mh-0">ม.ค.</th><th class="month-head" id="mh-1">ก.พ.</th><th class="month-head" id="mh-2">มี.ค.</th>
+            <th class="month-head" id="mh-3">เม.ย.</th><th class="month-head" id="mh-4">พ.ค.</th><th class="month-head" id="mh-5">มิ.ย.</th>
+            <th class="month-head" id="mh-6">ก.ค.</th><th class="month-head" id="mh-7">ส.ค.</th><th class="month-head" id="mh-8">ก.ย.</th>
+            <th class="month-head" id="mh-9">ต.ค.</th><th class="month-head" id="mh-10">พ.ย.</th><th class="month-head" id="mh-11">ธ.ค.</th>
+          </tr>
+        </thead>
+        <tbody id="ganttBody"></tbody>
+      </table>
+    </div>
+    <div class="no-results" id="noResultsGantt" style="display:none;">ไม่พบบริการที่ตรงกับคำค้นหา/ตัวกรอง</div>
+  </div>
+</main>
+
+<script>
+const ITEMS = [{"no": 1, "desc": "การสื่อสาร/การขับเคลื่อนแผนกลยุทธ์ มจธ. ฉบับที่ 13", "tags": ["PLAN"], "active": [true, true, true, false, false, false, false, false, false, false, false, false], "note": "สื่อสารแผนกลยุทธ์ฉบับที่ 13 สู่หน่วยงาน ต้นปีงบประมาณ (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 2, "desc": "การจัดทำแผนปฏิบัติการ (Implementation Plan) ตามแผนกลยุทธ์ มจธ. ฉบับที่ 13", "tags": ["PLAN"], "active": [false, false, true, true, true, true, false, false, false, false, false, false], "note": "สื่อสารและจัดทำแผนปฏิบัติการ Implementation/Action Planประจำปี 1+2", "recip": ["หน่วยงาน"]}, {"no": 3, "desc": "การจัดทำข้อตกลงการปฏิบัติงานระดับหน่วยงาน (Performance Agreement, PA)", "tags": ["STG", "PLAN", "BUDGET", "Research", "RISK"], "active": [false, false, true, true, false, false, false, false, false, false, false, false], "note": "สื่อสารและจัดทำข้อตกลงการปฏิบัติงาน (PA) ระดับหน่วยงาน ประจำปี", "recip": ["หน่วยงาน"]}, {"no": 4, "desc": "การติดตามและประเมินผลการดำเนินงานตามแผนกลยุทธ์ ตามแผนกลยุทธ์ มจธ. ฉบับที่ 13", "tags": ["PLAN"], "active": [false, false, true, false, false, true, false, false, true, false, false, true], "note": "ประสานงานรับข้อมูลเพื่อจัดทำรายงานสภา ทุกไตรมาส", "recip": ["หน่วยงาน"]}, {"no": 5, "desc": "การสร้างความเข้าใจเกี่ยวกับแนวทางและวิธีการจัดทำแผนการดำเนินงาน และงบประมาณล่วงหน้าระยะปานกลาง (1+2)", "tags": ["PLAN", "BUDGET"], "active": [false, false, true, true, true, true, false, false, false, false, false, false], "note": "", "recip": ["บุคลากร", "หน่วยงาน"]}, {"no": 6, "desc": "แผนการรับนักศึกษา เข้าใหม่ ทั้งหมด และผู้สำเร็จการศึกษา", "tags": ["PLAN"], "active": [true, true, false, false, false, false, false, false, false, false, false, false], "note": "รวบรวม เผยแพร่แผนเพื่อประกอบการจัดทำงบประมาณ ประจำปี", "recip": ["หน่วยงาน", "บุคคลภายนอก"]}, {"no": 7, "desc": "แผนโครงการตามภารกิจ (Agenda Based) หรือโครงการตามนโยบายภาครัฐ อาทิ โครงการผลิตบัณฑิตพันธุ์ใหม่ / Reinventing University System / โครงการสำคัญ / โครงการภายใต้แผนพัฒนาภาค โครงการตามแผนงานบูรณาการต่าง ๆ", "tags": ["PLAN", "BUDGET"], "active": [false, true, true, true, false, false, false, false, false, false, false, false], "note": "รวบรวมข้อเสนอโครงการ Agenda Based ประกอบคำของบประมาณ (ร่าง)", "recip": ["หน่วยงาน", "บุคคลภายนอก"]}, {"no": 8, "desc": "แผนการจัดตั้งหน่วยงานใหม่ / การปรับโครงสร้างหน่วยงาน", "tags": ["PLAN"], "active": [false, false, false, false, false, false, false, true, true, true, false, false], "note": "เสนอแผนจัดตั้ง/ปรับโครงสร้างหน่วยงาน ตามรอบเสนอสภา (ไม่มีรอบตายตัว - ร่าง)", "recip": ["หน่วยงาน", "บุคคลภายนอก"]}, {"no": 9, "desc": "แผนการบริหารความเสี่ยง (Risk Management)", "tags": ["RISK"], "active": [false, false, true, false, false, true, false, false, true, false, false, true], "note": "ประสานงานรับข้อมูลเพื่อรายงาน RMC ทุกไตรมาส / รายงานสภาทุก 6 เดือน", "recip": ["บุคลากร", "หน่วยงาน"]}, {"no": 10, "desc": "การใช้ระบบบริหารความเสี่ยง (Risk Management System, RMS.)", "tags": ["RISK"], "active": [false, false, true, false, false, false, false, false, true, false, true, false], "note": "หน่วยงานนำส่งข้อมูลในระบบ RMS. /ให้ความเห็น ผลรอบ 6/12 เดือน ", "recip": ["บุคลากร", "หน่วยงาน"]}, {"no": 11, "desc": "KMUTT Strategy Diagnosis", "tags": ["STG", "PLAN", "BUDGET", "Research", "RISK"], "active": [false, false, false, false, true, true, true, false, false, false, false, false], "note": "การจัดทำข้อมูลและกำหนดการประชุมระหว่างผู้บริหาร ม. + หน่วยงาน", "recip": ["หน่วยงาน"]}, {"no": 12, "desc": "การจัดทำคำของบประมาณแผ่นดินประจำปี (งบลงทุน)", "tags": ["BUDGET"], "active": [true, true, false, false, false, false, false, false, false, false, false, true], "note": "จัดทำและนำส่งคำของบประมาณลงทุนต่อสำนักงบประมาณ (ร่าง)", "recip": ["หน่วยงาน"]}, {"no": 13, "desc": "แผนงบประมาณลงทุนเชิงยุทธศาสตร์ระยะ 5 ปี (Strategic Investment Plan)", "tags": ["PLAN", "BUDGET"], "active": [true, true, false, false, false, false, false, false, false, false, false, true], "note": "ทบทวน/ปรับปรุงแผนงบลงทุนเชิงยุทธศาสตร์ระยะ 5 ปี (ร่าง)", "recip": ["หน่วยงาน"]}, {"no": 14, "desc": "การสนับสนุนข้อมูลเพื่อจัดทำคำของบประมาณประจำปี (แบบ 1+2)", "tags": ["PLAN", "BUDGET"], "active": [false, false, true, true, true, true, false, false, false, false, false, false], "note": "", "recip": ["หน่วยงาน", "บุคคลภายนอก"]}, {"no": 15, "desc": "การวิเคราะห์งบประมาณโครงการต่าง ๆ อาทิ งบประมาณหลักสูตรปรับปรุง-ใหม่ การปรับค่าเล่าเรียน การศึกษาดูงานต่างประเทศ การลงทุนโครงการใหม่ การขออนุมัติโครงการที่ขอใช้เงินสะสมหน่วยงาน/มหาวิทยาลัย", "tags": ["BUDGET"], "active": [true, true, true, true, true, true, true, true, true, true, true, true], "note": "วิเคราะห์งบประมาณตามคำขอที่ยื่นเข้ามา ต่อเนื่องตลอดปี (ร่าง)", "recip": ["หน่วยงาน"]}, {"no": 16, "desc": "การปรับแผนการดำเนินงานและงบประมาณรายจ่ายประจำปีงบประมาณ", "tags": ["BUDGET"], "active": [false, true, true, true, false, false, false, false, false, false, false, false], "note": "รอบปรับแผนดำเนินงาน/งบประมาณรายจ่ายกลางปีงบประมาณ (ร่าง)", "recip": ["หน่วยงาน", "บุคคลภายนอก"]}, {"no": 17, "desc": "การบริหารงบประมาณแบบมุ่งเน้นผลงาน (Performance Based Budgeting System; PBBS)", "tags": ["BUDGET"], "active": [true, false, false, true, false, false, true, false, false, true, false, false], "note": "ติดตามผลบริหารงบประมาณแบบมุ่งเน้นผลงาน รายไตรมาส (ร่าง)", "recip": ["หน่วยงาน"]}, {"no": 18, "desc": "การขอกรอบอัตรากำลังพนักงานมหาวิทยาลัย/การขออนุมัติการจ้างผู้มีความรู้ความสามารถพิเศษปฏิบัติงานในมหาวิทยาลัย", "tags": ["PLAN", "BUDGET"], "active": [true, false, false, false, false, false, false, false, false, false, true, true], "note": "ยื่นขอกรอบอัตรากำลัง/อนุมัติจ้างฯ รอบต้นปีงบประมาณ (ร่าง)", "recip": ["หน่วยงาน"]}, {"no": 19, "desc": "การใช้ระบบบริหารงบประมาณ e-Budgeting", "tags": ["BUDGET"], "active": [true, true, true, true, true, true, true, true, true, true, true, true], "note": "ใช้งานระบบ e-Budgeting ต่อเนื่องตลอดปี (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน"]}, {"no": 20, "desc": "หนังสือสารสนเทศประจำปี ", "tags": ["Research"], "active": [false, false, false, false, false, false, false, false, false, true, true, true], "note": "รวบรวม-จัดพิมพ์หนังสือสารสนเทศประจำปี หลังปิดปีงบประมาณ (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน"]}, {"no": 21, "desc": "ข้อมูลและสถิติของมหาวิทยาลัย (Fact and Figures of University)", "tags": ["Research"], "active": [false, false, false, false, false, false, false, false, false, true, true, true], "note": "จัดทำข้อมูลและสถิติของมหาวิทยาลัยประจำปี (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 22, "desc": "รายงานประจำปี", "tags": ["Research"], "active": [true, false, false, false, false, false, false, false, false, false, true, true], "note": "จัดทำรายงานประจำปี หลังปิดปีงบประมาณ (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 23, "desc": "รายงานมหาวิทยาลัยที่ดี (Good University Report)", "tags": ["Research"], "active": [true, false, false, false, false, false, false, false, false, false, true, true], "note": "จัดทำรายงานมหาวิทยาลัยที่ดี (Good University Report) (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 24, "desc": "ข้อมูลการสำรวจภาวะการมีงานทำของบัณฑิต มจธ. ", "tags": ["Research"], "active": [false, false, false, false, false, true, true, true, false, false, false, false], "note": "สำรวจภาวะการมีงานทำของบัณฑิต หลังสำเร็จการศึกษา ~1 ปี (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 25, "desc": "ข้อมูลการสำรวจความพึงพอใจของผู้ใช้บัณฑิต มจธ.", "tags": ["Research"], "active": [false, false, false, false, false, true, true, true, false, false, false, false], "note": "สำรวจความพึงพอใจของผู้ใช้บัณฑิต มจธ. (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 26, "desc": "ข้อมูลสรุปผลการจัดอันดับ (Ranking) ของ มจธ.", "tags": ["Research"], "active": [false, false, false, false, false, true, false, true, true, true, false, false], "note": "ติดตาม/สรุปผลการจัดอันดับ (QS, THE, ARWU ฯลฯ) ตามรอบประกาศผล (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 27, "desc": "หนังสือแนวโน้มพัฒนาการของ มจธ. (Trend)", "tags": ["Research"], "active": [false, false, false, false, false, false, false, false, false, false, true, true], "note": "จัดทำหนังสือแนวโน้มพัฒนาการของ มจธ. (Trend) ประจำปี (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 28, "desc": "ข้อมูลแสดงผลการดำเนินงาน (Dashboard - Operation) (ด้านบุคลากร และนักศึกษา)", "tags": ["Research"], "active": [true, true, true, true, true, true, true, true, true, true, true, true], "note": "ปรับปรุงข้อมูล Dashboard ด้านบุคลากรและนักศึกษา ต่อเนื่องรายเดือน (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}, {"no": 29, "desc": "ข้อมูล Dashboard – K-STG Strategy, Transformation & Goal อาทิ ด้าน Strategy / แผน-ผล นักศึกษา / ข้อมูลงบประมาณ / Performance / Potential", "tags": ["STG", "PLAN", "BUDGET", "Research", "RISK"], "active": [true, true, true, true, true, true, true, true, true, true, true, true], "note": "ปรับปรุงข้อมูล Dashboard K-STG ต่อเนื่องรายเดือน (ร่าง)", "recip": ["บุคลากร", "หน่วยงาน", "บุคคลภายนอก"]}];
+
+const GROUP_META = {
+  STG:     {color:'#0B2A4A', label:'STG',      team:'ทีมยุทธศาสตร์ (STG)'},
+  PLAN:    {color:'#2E7D5B', label:'PLAN',     team:'ทีมแผนงาน (PLAN)'},
+  BUDGET:  {color:'#3B6FA0', label:'BUDGET',   team:'ทีมงบประมาณ (BUDGET)'},
+  Research:{color:'#8452A3', label:'Research',team:'ทีมสถาบันวิจัยและข้อมูล (Research)'},
+  RISK:    {color:'#C0392B', label:'RISK',     team:'ทีมบริหารความเสี่ยง (RISK)'}
+};
+
+const MONTH_NAMES = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+// "today" fixed per conversation context
+const TODAY = new Date(2026,7,3); // Aug 3, 2026
+const CUR_M = TODAY.getMonth(); // 0-indexed
+
+document.getElementById('todayChip').textContent =
+  '● วันนี้: ' + TODAY.getDate() + ' ' + MONTH_NAMES[CUR_M] + ' ' + (TODAY.getFullYear()+543);
+
+function getRanges(active){
+  const n=12, ranges=[];
+  for(let start=0;start<n;start++){
+    const prev=(start+n-1)%n;
+    if(active[start] && !active[prev]){
+      let end=start;
+      let guard=0;
+      while(active[(end+1)%n] && (end+1)%n!==start && guard<12){ end=(end+1)%n; guard++; }
+      ranges.push({start,end});
+    }
+  }
+  return ranges;
+}
+
+function monthInRange(m,r){
+  if(r.start<=r.end) return m>=r.start && m<=r.end;
+  return m>=r.start || m<=r.end;
+}
+
+function forwardDist(from,to){ return (to-from+12)%12; }
+
+function computeStatus(item){
+  if(item.active.every(x=>x)) return {key:'ongoing', label:'ต่อเนื่องตลอดปี'};
+  const ranges = getRanges(item.active);
+  if(ranges.length===0) return {key:'upcoming', label:'ยังไม่ถึงกำหนด'};
+
+  // is current month inside any range?
+  for(const r of ranges){ if(monthInRange(CUR_M,r)) return {key:'due', label:'ถึงกำหนด/กำลังดำเนินการ', range:r}; }
+
+  // find nearest upcoming range start & most recent passed range end
+  let best=null, bestDist=99;
+  for(const r of ranges){
+    const d = forwardDist(CUR_M, r.start);
+    if(d<bestDist){bestDist=d; best=r;}
+  }
+  let recentEndDist=99;
+  for(const r of ranges){
+    const d = forwardDist(r.end, CUR_M); // months since this range ended
+    if(d<recentEndDist) recentEndDist=d;
+  }
+  if(bestDist===1) return {key:'prep', label:'ควรเริ่มเตรียมการ', range:best};
+  if(recentEndDist < bestDist) return {key:'passed', label:'ผ่านช่วงดำเนินการแล้ว', range:best};
+  return {key:'upcoming', label:'ยังไม่ถึงกำหนด', range:best};
+}
+
+const STATUS_COLORS = {
+  due:'var(--orange)', prep:'var(--amber)', upcoming:'var(--blue)',
+  passed:'var(--gray)', ongoing:'var(--green)'
+};
+const STATUS_DIM = {
+  due:'var(--orange-dim)', prep:'var(--amber-dim)', upcoming:'var(--blue-dim)',
+  passed:'var(--gray-dim)', ongoing:'var(--green-dim)'
+};
+const STATUS_TEXT = {
+  due:'#8a4c00', prep:'#7a4a08', upcoming:'#22456b', passed:'#4b525a', ongoing:'#1d5c40'
+};
+
+function monthsBar(active, size){
+  let html = '<div class="months">';
+  for(let i=0;i<12;i++){
+    const cls = ['m'];
+    if(active[i]) cls.push('active');
+    if(i===CUR_M) cls.push('current');
+    if(i%3===2) cls.push('q-edge');
+    html += `<div class="${cls.join(' ')}" style="${size?('height:'+size+'px'):''}"></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+function monthsLabels(){
+  let html = '<div class="mlabels">';
+  for(let i=0;i<12;i++){
+    html += `<span class="${i%3===2?'q-edge':''}">${MONTH_NAMES[i]}</span>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function deadlineText(item, st){
+  if(st.key==='ongoing') return {prep:'ไม่มีวันเริ่มตายตัว — ดำเนินการทุกเดือน', deadline:'ไม่มีกำหนดสิ้นสุด (ต่อเนื่องตลอดปี)'};
+  const r = st.range;
+  if(!r) return {prep:'-', deadline:'-'};
+  const prepIdx = (r.start+11)%12;
+  const rangeLabel = r.start===r.end ? MONTH_NAMES[r.start] : (MONTH_NAMES[r.start]+' – '+MONTH_NAMES[r.end]) + (r.start>r.end? ' (ข้ามปี)':'');
+  return {
+    prep: 'ควรเริ่มเตรียมข้อมูลตั้งแต่เดือน ' + MONTH_NAMES[prepIdx],
+    deadline: 'ช่วงดำเนินการ ' + rangeLabel + ' · กำหนดแล้วเสร็จภายในเดือน ' + MONTH_NAMES[r.end]
+  };
+}
+
+function tagPill(tag){
+  const meta = GROUP_META[tag] || {color:'#999',label:tag};
+  return `<span class="tag" style="background:${meta.color}">${meta.label}</span>`;
+}
+
+let expandedNo = null;
+let currentTab = 'cards';
+
+function getFiltered(){
+  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+  const activeGroup = document.querySelector('.chip.group.active')?.dataset.group || 'all';
+  const statusVal = document.getElementById('statusFilter').value;
+  const out = [];
+  ITEMS.forEach(item=>{
+    const st = computeStatus(item);
+    if(q && !item.desc.toLowerCase().includes(q) && !item.note.toLowerCase().includes(q)) return;
+    if(activeGroup!=='all' && !item.tags.includes(activeGroup)) return;
+    if(statusVal!=='all' && st.key!==statusVal) return;
+    out.push({item, st});
+  });
+  return out;
+}
+
+function buildGantt(filtered){
+  const body = document.getElementById('ganttBody');
+  body.innerHTML = filtered.map(({item,st})=>{
+    const cells = item.active.map((on,i)=>{
+      const cls=['month-cell'];
+      if(on) cls.push('active');
+      if(i===CUR_M) cls.push('current');
+      return `<td class="${cls.join(' ')}"><div class="bar"></div></td>`;
+    }).join('');
+    return `<tr>
+      <td class="name-cell">
+        <div class="gname-top"><span class="no-badge small">#${String(item.no).padStart(2,'0')}</span>${item.tags.map(tagPill).join('')}</div>
+        <div class="gname-title">${item.desc}</div>
+        <div class="gname-status"><i style="background:${STATUS_COLORS[st.key]}"></i>${st.label}</div>
+      </td>
+      ${cells}
+    </tr>`;
+  }).join('');
+  document.getElementById('noResultsGantt').style.display = filtered.length===0 ? 'block' : 'none';
+}
+
+function render(){
+  const filtered = getFiltered();
+  const grid = document.getElementById('grid');
+  grid.innerHTML='';
+  let shown=0;
+
+  filtered.forEach(({item, st})=>{
+    shown++;
+
+    const card = document.createElement('div');
+    card.className = 'card' + (expandedNo===item.no ? ' expanded' : '');
+    const dl = deadlineText(item, st);
+    const teams = item.tags.map(t=>GROUP_META[t]?.team || t);
+
+    let inner = `
+      <div class="card-head">
+        <div class="no-badge">#${String(item.no).padStart(2,'0')}</div>
+        <div class="tags">${item.tags.map(tagPill).join('')}</div>
+      </div>
+      <div class="title">${item.desc}</div>
+      <div class="timeline">${monthsBar(item.active)}</div>
+      <div class="footer-row">
+        <span class="status-badge" style="background:${STATUS_DIM[st.key]};color:${STATUS_TEXT[st.key]}"><i style="background:${STATUS_COLORS[st.key]}"></i>${st.label}</span>
+        <span class="expand-hint">${expandedNo===item.no ? 'ย่อกลับ ▲' : 'ดูรายละเอียด ▼'}</span>
+      </div>`;
+
+    if(expandedNo===item.no){
+      inner += `
+      <div class="details">
+        <div class="d-block">
+          <h4>รายละเอียดบริการ</h4>
+          <p>${item.desc}</p>
+          <h4>ผู้รับบริการ</h4>
+          <div class="pill-row">${item.recip.map(r=>`<span class="pill">${r}</span>`).join('')}</div>
+          <h4>ทีมที่รับผิดชอบ / ประสานงาน</h4>
+          <div class="pill-row">${teams.map(t=>`<span class="pill">${t}</span>`).join('')}</div>
+          ${item.note ? `<h4>สิ่งที่ต้องเตรียม / หมายเหตุ</h4><p>${item.note.replace(' (ร่าง)','')}</p>` : ''}
+          ${item.note && item.note.includes('(ร่าง)') ? `<div class="draft-note">⚠ ช่วงเวลานี้เป็นข้อมูลร่างเบื้องต้น ยังไม่ได้รับการยืนยันจากเจ้าของภารกิจ โปรดตรวจสอบก่อนใช้สื่อสารจริง</div>` : ''}
+        </div>
+        <div class="d-block">
+          <h4>กำหนดการ</h4>
+          <div class="info-line"><b>ควรเริ่มเตรียมการ</b><span>${dl.prep}</span></div>
+          <div class="info-line"><b>กำหนดการ/เส้นตาย</b><span>${dl.deadline}</span></div>
+          <h4 style="margin-top:14px;">ปฏิทินรายเดือน (${TODAY.getFullYear()+543})</h4>
+          <div class="full-months">${monthsBar(item.active,26)}${monthsLabels()}</div>
+        </div>
+      </div>`;
+    }
+
+    card.innerHTML = inner;
+    card.addEventListener('click', (e)=>{
+      expandedNo = expandedNo===item.no ? null : item.no;
+      render();
+    });
+    grid.appendChild(card);
+  });
+
+  document.getElementById('count').textContent = `แสดง ${shown} จาก ${ITEMS.length} บริการ`;
+  document.getElementById('noResults').style.display = shown===0 ? 'block' : 'none';
+
+  buildGantt(filtered);
+}
+
+// build group chips
+const groupBar = document.getElementById('groupChips');
+const allChip = document.createElement('div');
+allChip.className='chip group active';
+allChip.dataset.group='all';
+allChip.textContent='ทั้งหมด';
+groupBar.appendChild(allChip);
+Object.entries(GROUP_META).forEach(([key,meta])=>{
+  const c = document.createElement('div');
+  c.className='chip group';
+  c.dataset.group=key;
+  c.innerHTML = `<span class="dot" style="background:${meta.color}"></span>${meta.label}`;
+  groupBar.appendChild(c);
+});
+groupBar.addEventListener('click', (e)=>{
+  const chip = e.target.closest('.chip.group');
+  if(!chip) return;
+  document.querySelectorAll('.chip.group').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  render();
+});
+
+document.getElementById('searchBox').addEventListener('input', render);
+document.getElementById('statusFilter').addEventListener('change', render);
+
+const tabCardsBtn = document.getElementById('tabCardsBtn');
+const tabGanttBtn = document.getElementById('tabGanttBtn');
+tabCardsBtn.addEventListener('click', ()=>{
+  currentTab = 'cards';
+  tabCardsBtn.classList.add('active');
+  tabGanttBtn.classList.remove('active');
+  document.getElementById('viewCards').classList.add('active');
+  document.getElementById('viewGantt').classList.remove('active');
+});
+tabGanttBtn.addEventListener('click', ()=>{
+  currentTab = 'gantt';
+  tabGanttBtn.classList.add('active');
+  tabCardsBtn.classList.remove('active');
+  document.getElementById('viewGantt').classList.add('active');
+  document.getElementById('viewCards').classList.remove('active');
+});
+
+document.getElementById('mh-'+CUR_M).classList.add('current-head');
+
+render();
+</script>
+</body>
+</html>
