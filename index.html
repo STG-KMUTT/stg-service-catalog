@@ -536,8 +536,13 @@ const RECIP_DEFS = {
 
 const MONTH_NAMES = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
-// "today" fixed per conversation context
-const TODAY = new Date(2026,7,3); // Aug 3, 2026
+// วันที่ปัจจุบันจริง อิงเวลาไทย (Asia/Bangkok) เสมอ ไม่ผูกกับ timezone ของเครื่องผู้ใช้
+const TODAY = (function(){
+  const p = new Intl.DateTimeFormat('en-CA',{
+    timeZone:'Asia/Bangkok', year:'numeric', month:'2-digit', day:'2-digit'
+  }).format(new Date()).split('-').map(Number);
+  return new Date(p[0], p[1]-1, p[2]);
+})();
 const CUR_M = TODAY.getMonth(); // 0-indexed
 
 document.getElementById('todayChip').textContent =
