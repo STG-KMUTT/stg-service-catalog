@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบสำรวจความพึงพอใจ | สำนักงานยุทธศาสตร์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2A4A; --navy-2:#123A63; --orange:#F8931D;
+    --amber:#B8710E; --blue:#3B6FA0; --gray:#8D96A3; --green:#2E7D5B;
+    --bg:#F4F6F8; --card:#FFFFFF; --border:#E1E5EA; --text:#1D2733; --mute:#69737F;
+    --danger:#C0392B;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+  header.top{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+    color:#fff;padding:26px 32px 20px;position:sticky;top:0;z-index:30;
+    box-shadow:0 4px 18px rgba(11,42,74,.18);
+  }
+  .eyebrow{font-family:'Kanit',sans-serif;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);font-weight:600;margin-bottom:6px;}
+  h1{font-family:'Kanit',sans-serif;font-size:24px;font-weight:700;margin:0 0 4px;}
+  .sub{font-size:14px;color:#C8D3DE;max-width:820px;line-height:1.55;}
+  .back-link{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:13px;color:#C8D3DE;text-decoration:none;}
+  .back-link:hover{color:#fff;}
+  .steps{display:flex;gap:6px;margin-top:16px;flex-wrap:wrap;}
+  .step-btn{
+    font-family:'Kanit',sans-serif;font-size:12.5px;font-weight:600;
+    padding:6px 13px;border-radius:100px;border:1px solid rgba(255,255,255,.25);
+    background:rgba(255,255,255,.06);color:#C8D3DE;cursor:pointer;transition:all .15s;
+  }
+  .step-btn:hover{background:rgba(255,255,255,.14);color:#fff;}
+  .step-btn.active{background:var(--orange);border-color:var(--orange);color:#fff;}
+
+  main{max-width:980px;margin:0 auto;padding:26px 24px 80px;}
+  .section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:20px;scroll-margin-top:170px;}
+  .section h2{font-family:'Kanit',sans-serif;font-size:19px;color:var(--navy);margin:0 0 4px;}
+  .section .s-desc{font-size:13.5px;color:var(--mute);margin-bottom:20px;line-height:1.6;}
+  .req{color:var(--danger);}
+
+  fieldset{border:none;padding:0;margin:0 0 22px;}
+  legend{font-family:'Kanit',sans-serif;font-size:15px;font-weight:600;color:var(--text);margin-bottom:10px;padding:0;}
+  .radio-row{display:flex;flex-direction:column;gap:8px;}
+  .radio-opt{display:flex;align-items:center;gap:9px;font-size:14px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:border-color .15s,background .15s;}
+  .radio-opt:hover{border-color:var(--navy-2);background:#F8FAFC;}
+  .radio-opt input{accent-color:var(--navy);width:16px;height:16px;flex-shrink:0;}
+  .radio-opt.checked{border-color:var(--orange);background:#FFF6EA;}
+
+  select, textarea, input[type=text]{
+    width:100%;font-family:'Sarabun',sans-serif;font-size:14px;padding:10px 12px;
+    border:1px solid var(--border);border-radius:9px;color:var(--text);background:#fff;
+  }
+  select:focus, textarea:focus, input:focus{outline:none;border-color:var(--navy-2);box-shadow:0 0 0 3px rgba(18,58,99,.1);}
+  textarea{resize:vertical;min-height:80px;line-height:1.6;}
+  .field{margin-bottom:16px;}
+  .field label.flabel{display:block;font-size:13.5px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+  .hidden{display:none !important;}
+
+  /* rating table */
+  .rate-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
+  table.rate{border-collapse:collapse;width:100%;min-width:760px;font-size:13px;}
+  table.rate thead th{
+    background:var(--navy-2);color:#fff;font-family:'Kanit',sans-serif;font-weight:600;
+    padding:10px 6px;text-align:center;font-size:12px;position:sticky;top:0;
+  }
+  table.rate thead th.item-head{text-align:left;padding:10px 14px;min-width:260px;}
+  table.rate tbody td{border-bottom:1px solid var(--border);padding:8px 6px;text-align:center;}
+  table.rate tbody td.item-cell{text-align:left;padding:10px 14px;font-size:13.5px;line-height:1.4;}
+  table.rate tbody tr:nth-child(even){background:#FAFBFC;}
+  table.rate tbody tr:hover{background:#F3F7FB;}
+  table.rate input[type=radio]{accent-color:var(--orange);width:16px;height:16px;cursor:pointer;}
+  .never-col{color:var(--mute);font-size:11px;}
+
+  .score10-row{display:flex;gap:6px;flex-wrap:wrap;}
+  .score10-opt{
+    width:40px;height:40px;border-radius:9px;border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;
+    font-weight:600;font-size:14px;cursor:pointer;transition:all .15s;
+  }
+  .score10-opt:hover{border-color:var(--navy-2);}
+  .score10-opt.checked{background:var(--orange);border-color:var(--orange);color:#fff;}
+  .score10-opt input{display:none;}
+
+  .nav-buttons{display:flex;justify-content:space-between;margin-top:8px;}
+  button.nav-btn, button.submit-btn{
+    font-family:'Kanit',sans-serif;font-weight:600;font-size:14px;padding:11px 22px;
+    border-radius:10px;border:none;cursor:pointer;transition:all .15s;
+  }
+  button.nav-btn{background:#EAEDF1;color:var(--navy);}
+  button.nav-btn:hover{background:#DCE2E8;}
+  button.submit-btn{background:var(--orange);color:#fff;}
+  button.submit-btn:hover{background:#e07f0d;}
+  button.nav-btn:disabled, button.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .banner{background:#FFF6EA;border:1px solid #F3D8A6;color:#8a4c00;font-size:13px;padding:10px 14px;border-radius:9px;margin-bottom:18px;}
+  .error-banner{background:#FCEBEA;border:1px solid #F1B7B1;color:#8a1f14;font-size:13.5px;padding:12px 16px;border-radius:9px;margin-bottom:18px;display:none;}
+
+  /* privacy notice */
+  .privacy-card{
+    background:#F0F4F8;border:1px solid #C9D6E3;border-radius:14px;
+    padding:20px 22px;margin-bottom:20px;
+  }
+  .privacy-card h3{
+    font-family:'Kanit',sans-serif;font-size:15.5px;color:var(--navy);margin:0 0 10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .privacy-card p{font-size:13px;line-height:1.7;color:var(--text);margin:0 0 8px;}
+  .privacy-card ul{margin:0 0 8px;padding-left:20px;font-size:13px;line-height:1.7;color:var(--text);}
+  .privacy-card .privacy-links{font-size:12.5px;margin-top:10px;}
+  .privacy-card .privacy-links a{color:var(--navy-2);}
+  .privacy-toggle{
+    font-size:12.5px;color:var(--navy-2);text-decoration:underline;cursor:pointer;
+    background:none;border:none;padding:0;font-family:'Sarabun',sans-serif;
+  }
+  .privacy-detail{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed #C9D6E3;}
+  .consent-row{
+    display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--border);
+    border-radius:10px;padding:12px 14px;margin-top:14px;
+  }
+  .consent-row input{width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--navy);}
+  .consent-row label{font-size:13.5px;line-height:1.6;cursor:pointer;}
+
+  /* section divider (visual break between rating topics) */
+  .section-divider{
+    background:linear-gradient(180deg,#FFFFFF 0%, #FAFBFC 100%);
+    border:1.5px solid var(--divider-color, var(--navy-2));
+    border-radius:14px;
+    padding:22px 24px 20px;
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .divider-icon{
+    width:56px;height:56px;border-radius:50%;
+    background:var(--divider-color, var(--navy-2));
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;margin:0 auto 12px;
+    box-shadow:0 4px 14px rgba(0,0,0,.12);
+  }
+  .divider-title{
+    font-family:'Kanit',sans-serif;font-weight:600;font-size:15px;
+    color:var(--divider-color, var(--navy-2));
+    max-width:640px;margin:0 auto 16px;line-height:1.5;
+  }
+  .divider-scale{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding-top:14px;border-top:1px dashed var(--border);}
+  .scale-item{display:flex;flex-direction:column;align-items:center;gap:4px;width:62px;}
+  .scale-item .face{font-size:22px;}
+  .scale-item .face-label{font-size:10.5px;color:var(--mute);line-height:1.3;text-align:center;}
+  .scale-item .face-dot{width:22px;height:22px;border-radius:50%;background:#2A2E33;}
+
+  .quad-divider{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:6px;}
+  .quad-item{display:flex;flex-direction:column;align-items:center;gap:8px;width:150px;}
+  .quad-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 3px 10px rgba(0,0,0,.1);}
+  .quad-label{font-family:'Kanit',sans-serif;font-size:12.5px;font-weight:600;text-align:center;line-height:1.4;}
+  .quad-desc{font-size:11px;color:var(--mute);text-align:center;line-height:1.4;}
+
+  .thankyou{text-align:center;padding:60px 20px;}
+  .thankyou h2{font-family:'Kanit',sans-serif;font-size:26px;color:var(--navy);margin-bottom:12px;}
+  .thankyou p{color:var(--mute);font-size:15px;max-width:520px;margin:0 auto 8px;line-height:1.7;}
+  .thankyou .checkmark{width:64px;height:64px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+
+  @media (max-width:640px){
+    main{padding:16px 12px 60px;}
+    .section{padding:18px 16px;}
+    table.rate{font-size:12px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="eyebrow">STG · Satisfaction Survey</div>
+  <h1>แบบสำรวจความพึงพอใจต่อการให้บริการของสำนักงานยุทธศาสตร์</h1>
+  <div class="sub" id="periodLabel">ประจำปีงบประมาณ 2569 (ประเมินภาพรวมทั้งปี) — ระยะเวลาดำเนินการ 1-31 ตุลาคม</div>
+  <a class="back-link" href="index.html">← กลับไปหน้าคลังบริการ</a>
+  <div class="steps" id="stepsNav"></div>
+</header>
+
+<main>
+
+<form id="surveyForm" novalidate>
+
+  <!-- PDPA PRIVACY NOTICE -->
+  <div class="privacy-card" id="privacyCard">
+    <h3>🔐 ประกาศเกี่ยวกับข้อมูลส่วนบุคคล (PDPA)</h3>
+    <p>
+      สำนักงานยุทธศาสตร์ มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี (มจธ.) เก็บรวบรวมข้อมูลจากแบบสำรวจนี้
+      <strong>เพื่อวัตถุประสงค์การสำรวจความพึงพอใจต่อการให้บริการของ สนย. เท่านั้น</strong> ตามที่ระบุไว้ในหัวข้อ
+      "วัตถุประสงค์และคำชี้แจง" ด้านล่าง โดยดำเนินการภายใต้ข้อบังคับมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี
+      ว่าด้วยการคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2563
+    </p>
+    <button type="button" class="privacy-toggle" id="privacyToggleBtn">ดูรายละเอียดเพิ่มเติม ▾</button>
+    <div class="privacy-detail" id="privacyDetail">
+      <ul>
+        <li><strong>ข้อมูลที่จัดเก็บ:</strong> สถานภาพผู้ตอบ สังกัดหน่วยงาน ระดับความพึงพอใจต่อบริการแต่ละหัวข้อ และข้อเสนอแนะปลายเปิด — แบบสำรวจนี้<strong>ไม่เก็บชื่อ-นามสกุล อีเมล หรือข้อมูลที่ระบุตัวตนผู้ตอบโดยตรง</strong></li>
+        <li><strong>ฐานทางกฎหมาย:</strong> ความยินยอมของท่าน และประโยชน์อันชอบธรรมในการปรับปรุงพัฒนาการให้บริการของหน่วยงาน</li>
+        <li><strong>การเก็บรักษาและการใช้ข้อมูล:</strong> ข้อมูลจะถูกเก็บไว้ในระบบของ สนย. เพื่อประมวลผลและจัดทำรายงานสถิติ ไม่เปิดเผยต่อบุคคลภายนอกที่ไม่เกี่ยวข้อง และใช้เฉพาะภาพรวม/สถิติ ไม่ระบุตัวตนผู้ตอบรายบุคคล</li>
+        <li><strong>สิทธิของเจ้าของข้อมูล:</strong> ท่านมีสิทธิตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 เช่น สิทธิขอถอนความยินยอม สิทธิขอเข้าถึง/แก้ไข/ลบข้อมูล ภายใต้ข้อจำกัดของแบบสำรวจที่ไม่ระบุตัวตนผู้ตอบ</li>
+      </ul>
+      <div class="privacy-links">
+        เอกสารอ้างอิงฉบับเต็ม:
+        <a href="https://www.kmutt.ac.th/wp-content/uploads/2023/02/ข้อบังคับ-มจธ.-ว่าด้วย-การคุ้มครองข้อมูลส่.pdf" target="_blank" rel="noopener">ข้อบังคับ มจธ. ว่าด้วยการคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2563</a>
+        ·
+        <a href="https://www.kmutt.ac.th/wp-content/uploads/2022/12/4-5-คำประกาศเกี่ยวกับความเป็นส่วนตัว-บุคลากร.pdf" target="_blank" rel="noopener">คำประกาศเกี่ยวกับความเป็นส่วนตัว ด้านข้อมูลบุคลากร</a>
+        ·
+        <a href="https://www.kmutt.ac.th/privacy/" target="_blank" rel="noopener">ศูนย์รวมประกาศความเป็นส่วนตัว มจธ.</a>
+      </div>
+    </div>
+    <div class="consent-row">
+      <input type="checkbox" id="consentCheck" required>
+      <label for="consentCheck">ข้าพเจ้าได้อ่านและรับทราบประกาศเกี่ยวกับข้อมูลส่วนบุคคลข้างต้น และยินยอมให้เก็บรวบรวมข้อมูลเพื่อวัตถุประสงค์การสำรวจความพึงพอใจของสำนักงานยุทธศาสตร์ <span class="req">*</span></label>
+    </div>
+  </div>
+
+  <!-- SECTION 0: intro -->
+  <div class="section" id="sec-intro">
+    <h2>วัตถุประสงค์และคำชี้แจง</h2>
+    <p class="s-desc">
+      1) เพื่อสำรวจความพึงพอใจที่มีต่อการให้บริการของกลุ่มงานต่าง ๆ ในสำนักงานยุทธศาสตร์ (สนย.)<br>
+      2) เพื่อประมวลผลและจัดทำรายงานสถิติกลุ่มผู้รับบริการ/หน่วยงานที่เข้ารับบริการ และคุณภาพการให้บริการ<br>
+      3) เพื่อนำผลการประเมินไปปรับปรุงและพัฒนาการบริหารจัดการให้มีประสิทธิภาพและสอดคล้องกับความต้องการของผู้ใช้บริการ<br><br>
+      ให้ผู้ตอบทำเครื่องหมายเลือกและตอบตามความเป็นจริง การประเมินนี้จะไม่มีผลกระทบต่อผู้ตอบแบบสำรวจแต่ประการใด
+      ข้อคำถามที่มีสัญลักษณ์ <span class="req">*</span> หมายถึงบังคับตอบ
+    </p>
+    <div class="field">
+      <label class="flabel">รอบปีงบประมาณที่ประเมิน <span class="req">*</span></label>
+      <select id="fiscalYear" required>
+        <option value="2569">2569</option>
+        <option value="2570">2570</option>
+        <option value="2571">2571</option>
+        <option value="2572">2572</option>
+      </select>
+      <div id="yearLockNote" style="display:none;font-size:12px;color:var(--mute);margin-top:6px;">🔒 ปีงบประมาณถูกกำหนดโดยผู้ดูแลระบบสำหรับรอบสำรวจนี้</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: general info -->
+  <div class="section" id="sec-1">
+    <h2>ส่วนที่ 1 : ข้อมูลทั่วไป</h2>
+    <p class="s-desc">หากท่านเป็น "ผู้บริหารมหาวิทยาลัย" ระบบจะข้ามไปส่วนที่ 2 ให้อัตโนมัติ</p>
+
+    <fieldset>
+      <legend>1. สถานภาพผู้ประเมิน <span class="req">*</span></legend>
+      <div class="radio-row" id="statusOptions"></div>
+    </fieldset>
+
+    <div id="affiliationBlock">
+      <fieldset>
+        <legend>2. สังกัดหน่วยงาน คณะ/สำนัก/สถาบัน <span class="req">*</span></legend>
+        <div class="field"><select id="affilMain"><option value="">— เลือก/ระบุ —</option></select></div>
+      </fieldset>
+
+      <fieldset id="affilOPWrap" class="hidden">
+        <legend>3. สังกัดหน่วยงาน (กรณีข้อ 2 เลือก "สำนักงานอธิการบดี (OP)") <span class="req">*</span></legend>
+        <div class="field"><select id="affilOP"><option value="">— เลือก/ระบุ —</option></select></div>
+      </fieldset>
+
+      <fieldset id="affilInhouseWrap" class="hidden">
+        <legend>4. สังกัดหน่วยงาน (กรณีข้อ 2 เลือก "หน่วยงานในกำกับ") <span class="req">*</span></legend>
+        <div class="field"><select id="affilInhouse"><option value="">— เลือก/ระบุ —</option></select></div>
+      </fieldset>
+    </div>
+  </div>
+
+  <!-- SECTION 2: process -->
+  <div class="section" id="sec-2">
+    <h2>ส่วนที่ 2 : ด้านขั้นตอน/กระบวนการให้บริการ</h2>
+    <p class="s-desc">ขั้นตอน/กระบวนการให้บริการไม่ยุ่งยาก/ไม่ซับซ้อน มีความยืดหยุ่น/คล่องตัว สะดวก/รวดเร็ว เหมาะสมตามความต้องการของผู้รับบริการ</p>
+    <div id="divider-process"></div>
+    <div class="rate-wrap"><table class="rate" id="table-process"></table></div>
+    <div class="field" style="margin-top:18px;">
+      <label class="flabel">2.2 ข้อเสนอแนะ ด้านขั้นตอน/กระบวนการให้บริการ (ถ้ามี)</label>
+      <textarea id="fb-process" placeholder="โปรดระบุหัวข้องาน/ประเด็นเรื่องงานประกอบ — หากไม่มี ระบุ &quot;-&quot;"></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 3: staff -->
+  <div class="section" id="sec-3">
+    <h2>ส่วนที่ 3 : ด้านเจ้าหน้าที่/บุคลากรผู้ให้บริการ</h2>
+    <p class="s-desc">เจ้าหน้าที่/บุคลากรผู้ให้บริการสามารถตอบข้อซักถาม/อธิบาย แนะนำ ชี้แจงอย่างชัดเจน ช่วยเหลือ แก้ไขปัญหาได้</p>
+    <div id="divider-staff"></div>
+    <div class="rate-wrap"><table class="rate" id="table-staff"></table></div>
+    <div class="field" style="margin-top:18px;">
+      <label class="flabel">3.2 ข้อเสนอแนะ ด้านเจ้าหน้าที่/บุคลากรผู้ให้บริการ (ถ้ามี)</label>
+      <textarea id="fb-staff" placeholder="โปรดระบุหัวข้องาน/ประเด็นเรื่องงานประกอบ — หากไม่มี ระบุ &quot;-&quot;"></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 4: data quality -->
+  <div class="section" id="sec-4">
+    <h2>ส่วนที่ 4 : ด้านคุณภาพของข้อมูลและระบบสารสนเทศ</h2>
+    <p class="s-desc">คุณภาพของข้อมูลมีความครบถ้วนสมบูรณ์ ถูกต้อง เชื่อถือ ตรวจสอบได้ อัปเดตตามกำหนดเวลา/ทันต่อการใช้งาน</p>
+    <div id="divider-data"></div>
+    <div class="rate-wrap"><table class="rate" id="table-data"></table></div>
+    <div class="field" style="margin-top:18px;">
+      <label class="flabel">4.2 ข้อเสนอแนะ ด้านคุณภาพของข้อมูลและระบบสารสนเทศ (ถ้ามี)</label>
+      <textarea id="fb-data" placeholder="โปรดระบุหัวข้องาน/ประเด็นเรื่องงานประกอบ — หากไม่มี ระบุ &quot;-&quot;"></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 5: overall -->
+  <div class="section" id="sec-5">
+    <h2>ส่วนที่ 5 : ข้อมูลการรับบริการและความพึงพอใจในภาพรวม</h2>
+
+    <fieldset>
+      <legend>1. ในรอบปีงบประมาณที่ผ่านมา ท่านใช้บริการสำนักงานยุทธศาสตร์ทุกส่วนงาน เฉลี่ยกี่ครั้งต่อปี <span class="req">*</span></legend>
+      <div class="radio-row" id="freqOptions"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>2. ในรอบปีงบประมาณที่ผ่านมา ท่านให้คะแนนการให้บริการของสำนักงานยุทธศาสตร์กี่คะแนน (10 = มากที่สุด) <span class="req">*</span></legend>
+      <div class="score10-row" id="score10Row"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3. ท่านเห็นด้วย/พึงพอใจต่อปัจจัยการบริการของสำนักงานยุทธศาสตร์ในภาพรวมแต่ละด้านอย่างไร <span class="req">*</span></legend>
+      <div id="divider-quad"></div>
+      <div class="rate-wrap"><table class="rate" id="table-overall-dims"></table></div>
+    </fieldset>
+
+    <div class="field">
+      <label class="flabel">4. สิ่งที่ท่านประทับใจ จากการได้รับการบริการของสำนักงานยุทธศาสตร์ <span class="req">*</span></label>
+      <textarea id="fb-impressed" placeholder="โปรดระบุหัวข้องาน/ประเด็นเรื่องงานประกอบ — หากไม่มี ระบุ &quot;-&quot;" required></textarea>
+    </div>
+    <div class="field">
+      <label class="flabel">5. ข้อเสนอแนะ สำหรับการปรับปรุง/พัฒนาการบริการให้ดียิ่งขึ้น <span class="req">*</span></label>
+      <textarea id="fb-suggest" placeholder="โปรดระบุหัวข้องาน/ประเด็นเรื่องงานประกอบ — หากไม่มี ระบุ &quot;-&quot;" required></textarea>
+    </div>
+    <div class="field">
+      <label class="flabel">6. ข้อเสนอแนะ สำหรับการปรับปรุงด้านการสื่อสาร <span class="req">*</span></label>
+      <textarea id="fb-comms" placeholder="โปรดระบุหัวข้องาน/ประเด็นเรื่องงานประกอบ — หากไม่มี ระบุ &quot;-&quot;" required></textarea>
+    </div>
+
+    <div class="error-banner" id="errorBanner"></div>
+    <div class="nav-buttons">
+      <button type="button" class="nav-btn" id="scrollTopBtn">↑ กลับขึ้นด้านบน</button>
+      <button type="submit" class="submit-btn" id="submitBtn">ส่งแบบสำรวจ</button>
+    </div>
+  </div>
+
+</form>
+
+<div class="thankyou hidden" id="thankyouBlock">
+  <div class="checkmark">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+  </div>
+  <h2>ขอบคุณที่ร่วมตอบแบบสำรวจฯ</h2>
+  <p>ข้อมูลของท่านจะถูกใช้ตามวัตถุประสงค์การสำรวจ และนำไปปรับปรุงกระบวนการทำงานของสำนักงานยุทธศาสตร์ให้มีประสิทธิภาพมากยิ่งขึ้น</p>
+  <p style="margin-top:20px;"><a class="back-link" style="color:var(--navy-2);" href="index.html">← กลับไปหน้าคลังบริการ</a></p>
+</div>
+
+</main>
+
+<script>
+/* ---------- Reference data ---------- */
+const PROCESS_STAFF_ITEMS = [
+ {no:1,  desc:"การสื่อสาร/การขับเคลื่อนแผนกลยุทธ์ มจธ. ฉบับที่ 13"},
+ {no:2,  desc:"การจัดทำแผนปฏิบัติการ (Implementation Plan) ตามแผนกลยุทธ์ มจธ. ฉบับที่ 13"},
+ {no:3,  desc:"การจัดทำข้อตกลงการปฏิบัติงานระดับหน่วยงาน (Performance Agreement, PA)"},
+ {no:4,  desc:"การติดตามและประเมินผลการดำเนินงานตามแผนกลยุทธ์ มจธ. ฉบับที่ 13"},
+ {no:5,  desc:"การสร้างความเข้าใจ/การสื่อสารเกี่ยวกับแนวทางและวิธีการจัดทำแผนการดำเนินงานและงบประมาณล่วงหน้าระยะปานกลาง (1+2)"},
+ {no:6,  desc:"แผนการรับนักศึกษา เข้าใหม่ ทั้งหมด และผู้สำเร็จการศึกษา"},
+ {no:7,  desc:"แผนโครงการตามภารกิจ (Agenda Based) หรือโครงการตามนโยบายภาครัฐ"},
+ {no:8,  desc:"แผนการจัดตั้งหน่วยงานใหม่ / การปรับโครงสร้างหน่วยงาน"},
+ {no:9,  desc:"แผนการบริหารความเสี่ยง (Risk Management)"},
+ {no:10, desc:"การใช้ระบบบริหารความเสี่ยง (Risk Management System, RMS.)"},
+ {no:11, desc:"KMUTT Strategy Diagnosis"},
+ {no:12, desc:"การจัดทำคำของบประมาณแผ่นดินประจำปี (งบลงทุน)"},
+ {no:13, desc:"แผนงบประมาณลงทุนเชิงยุทธศาสตร์ระยะ 5 ปี (Strategic Investment Plan)"},
+ {no:14, desc:"การสนับสนุนข้อมูลเพื่อจัดทำคำของบประมาณประจำปี (แบบ 1+2)"},
+ {no:15, desc:"การวิเคราะห์งบประมาณโครงการต่าง ๆ"},
+ {no:16, desc:"การปรับแผนการดำเนินงานและงบประมาณรายจ่ายประจำปีงบประมาณ"},
+ {no:17, desc:"การบริหารงบประมาณแบบมุ่งเน้นผลงาน (PBBS)"},
+ {no:18, desc:"การขออนุมัติกรอบอัตรากำลังพนักงานมหาวิทยาลัย/การจ้างผู้มีความรู้ความสามารถพิเศษ"},
+ {no:19, desc:"การใช้ระบบบริหารงบประมาณ e-Budgeting"},
+];
+
+const DATA_QUALITY_ITEMS = [
+ {no:1, desc:"หนังสือสารสนเทศประจำปี"},
+ {no:2, desc:"ข้อมูลและสถิติของมหาวิทยาลัย (Fact and Figures of University)"},
+ {no:3, desc:"รายงานประจำปี มจธ."},
+ {no:4, desc:"รายงานมหาวิทยาลัยที่ดี (Good University Report)"},
+ {no:5, desc:"ข้อมูลการสำรวจภาวะการมีงานทำของบัณฑิต มจธ."},
+ {no:6, desc:"ข้อมูลการสำรวจความพึงพอใจของผู้ใช้บัณฑิต มจธ."},
+ {no:7, desc:"ข้อมูลสรุปผลการจัดอันดับ (Ranking) ของ มจธ."},
+ {no:8, desc:"หนังสือแนวโน้มพัฒนาการของ มจธ. (Trend)"},
+ {no:9, desc:"ข้อมูลแสดงผลการดำเนินงาน (Dashboard - Operation) (ด้านบุคลากรและนักศึกษา)"},
+ {no:10, desc:"ข้อมูล Dashboard – K-STG (Strategy, Transformation & Goal)"},
+ {no:11, desc:"ข้อมูลเหล่านี้ได้สื่อสารถึงท่านอย่างเป็นระบบ", isComms:true},
+];
+
+const OVERALL_DIMS = [
+ {key:"process", label:"ด้านขั้นตอน/กระบวนการให้บริการ ไม่ยุ่งยาก/ไม่ซับซ้อน มีความเหมาะสม/ยืดหยุ่น/คล่องตัว"},
+ {key:"staff",   label:"ด้านเจ้าหน้าที่/บุคลากรผู้ให้บริการ สามารถตอบข้อซักถาม/อธิบาย แนะนำ ชี้แจงอย่างชัดเจน ช่วยเหลือ แก้ไขปัญหาได้"},
+ {key:"time",    label:"ด้านระยะเวลา ให้บริการด้วยความสะดวก รวดเร็ว เหมาะสมต่อความต้องการของผู้รับบริการ"},
+ {key:"quality", label:"ด้านคุณภาพของงาน/ข้อมูล มีความครบถ้วนสมบูรณ์ ถูกต้อง ตรวจสอบได้ อัปเดตตรงตามกำหนดเวลา/ทันต่อการใช้งาน"},
+];
+
+const STATUS_OPTIONS = [
+  {v:"exec_univ", t:"ผู้บริหารมหาวิทยาลัย (ข้ามไปส่วนที่ 2)"},
+  {v:"exec_fac",  t:"ผู้บริหารคณะ/สำนัก/สถาบัน และหน่วยงานในกำกับ"},
+  {v:"acad",      t:"บุคลากรสายวิชาการ: อาจารย์ / นักวิจัย"},
+  {v:"prof",      t:"บุคลากรสายวิชาชีพอื่น ๆ"},
+];
+
+const FREQ_OPTIONS = [
+  {v:"lt5",  t:"น้อยกว่า 5 ครั้ง ต่อปี"},
+  {v:"5-10", t:"5 - 10 ครั้ง ต่อปี"},
+  {v:"gt10", t:"มากกว่า 10 ครั้ง ต่อปี"},
+  {v:"weekly", t:"ใช้บริการเกือบทุกสัปดาห์"},
+];
+
+const LIST_A = [["FEN","คณะวิศวกรรมศาสตร์ (FEN)"],["FSci","คณะวิทยาศาสตร์ (FSci)"],["SoLA","คณะศิลปศาสตร์ (SoLA)"],["SIT","คณะเทคโนโลยีสารสนเทศ (SIT)"],["FIET","คณะครุศาสตร์อุตสาหกรรมและเทคโนโลยี (FIET)"],["SBT","คณะทรัพยากรชีวภาพและเทคโนโลยี (SBT)"],["SEEM","คณะพลังงานสิ่งแวดล้อมและวัสดุ (SEEM)"],["SoA+D","คณะสถาปัตยกรรมศาสตร์และการออกแบบ (SoA+D)"],["SoA+D_Media","คณะสถาปัตยกรรมศาสตร์ฯ โครงการร่วมบริหารหลักสูตรฯ (มีเดีย) (SoA+D Media)"],["GMI","บัณฑิตวิทยาลัยการจัดการและนวัตกรรม (GMI)"],["FIBO","สถาบันวิทยาการหุ่นยนต์ภาคสนาม (FIBO)"],["CMS","วิทยาลัยสหวิทยาการ (CMS)"],["PDTI","สถาบันพัฒนาและฝึกอบรมโรงงานต้นแบบ (PDTI)"],["ISTRS","สำนักวิจัยและบริการวิทยาศาสตร์และเทคโนโลยี (ISTRS)"],["SAI","สำนักอุทยานวิทยาศาสตร์และอุตสาหกรรม (SAI)"],["STIPI","สถาบันนโยบายวิทยาศาสตร์ เทคโนโลยีและนวัตกรรม (STIPI)"],["LI","สถาบันการเรียนรู้ (LI)"],["LIB","สำนักหอสมุด (LIB)"],["CC","สำนักคอมพิวเตอร์ (CC)"],["BGM","สำนักบริหารอาคารและสถานที่ (BGM)"],["OP","สำนักงานอธิการบดี (OP)"],["INHOUSE","หน่วยงานในกำกับ"]];
+const LIST_B = [["UCO","สำนักงานนิติการ (UCO)"],["USO","สำนักงานอำนวยการ (USO)"],["QA","สำนักงานประกันคุณภาพ (QA)"],["IA","สำนักงานกิจการต่างประเทศ (IA)"],["URO","สำนักงานมหาวิทยาลัยสัมพันธ์ (URO)"],["PR","กลุ่มงานการสื่อสารเชิงกลยุทธ์และการตลาด (PR)"],["EDS","สำนักงานพัฒนาการศึกษาและบริการ (EDS)"],["SAO","สำนักงานกิจการนักศึกษา (SAO)"],["ReO","สำนักงานทะเบียนนักศึกษา (ReO)"],["ARO","สำนักงานคัดเลือกและสรรหานักศึกษา (ARO)"],["RIPO","สำนักงานวิจัยนวัตกรรมและพันธมิตร (RIPO)"],["HRM","สำนักงานบริหารทรัพยากรบุคคล (HRM)"],["HRD","สำนักงานพัฒนาทรัพยากรบุคคล (HRD)"],["TrO","สำนักงานคลัง (TrO)"],["PAM","สำนักงานจัดหาและจัดการสินทรัพย์ (PAM)"],["BPU","กลุ่มงานจัดการผลประโยชน์และทรัพย์สิน (BPU)"],["HCU","กลุ่มงานบริการสุขภาพและอนามัย (HCU)"],["SFU","กลุ่มงานช่วยเหลือทางการเงินแก่นักศึกษา (SFU)"],["PI","ศูนย์นวัตกรรมนโยบาย (PI)"],["EESH","ศูนย์การจัดการด้านพลังงาน สิ่งแวดล้อมความปลอดภัยและชีวอนามัย (EESH)"],["RC","มจธ. ราชบุรี / ศูนย์บริการทางการศึกษาราชบุรี (RC)"],["BKT","สำนักงานบริหารจัดการทรัพยากรกายภาพ มจธ. บางขุนเทียน (BKT)"],["AUDIT","หน่วยตรวจสอบภายใน"],["COUNCIL","สภาคณาจารย์และพนักงาน"]];
+const LIST_C = [["JGSEE","บัณฑิตวิทยาลัยร่วมด้านพลังงานและสิ่งแวดล้อม (JGSEE)"],["KX","สำนักเคเอกซ์ / ศูนย์บริการทางการศึกษาในเมือง (KX)"],["NBF","โรงงานต้นแบบผลิตยาชีววัตถุแห่งชาติ (NBF)"],["DSIL","โรงเรียนดรุณสิกขาลัย (DSIL)"],["CIC","ศูนย์สอบเทียบเครื่องมือวัดอุตสาหกรรม (CIC)"],["KMUTTBC","ศูนย์หนังสือพระจอมเกล้าธนบุรี (KMUTT Book Center)"],["RESHALL","หอพักนักศึกษามหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี (Residence Hall KMUTT)"]];
+
+const SCALE_COLS_USE = [
+  {v:"never", label:"ไม่เคยใช้บริการ"},
+  {v:"5", label:"มากที่สุด (5)"},
+  {v:"4", label:"มาก (4)"},
+  {v:"3", label:"ปานกลาง (3)"},
+  {v:"2", label:"น้อย (2)"},
+  {v:"1", label:"น้อยที่สุด (1)"},
+  {v:"0", label:"ไม่พึงพอใจ (0)"},
+];
+const SCALE_COLS_DATA = [
+  {v:"never", label:"ไม่เคยใช้ข้อมูล"},
+  {v:"5", label:"มากที่สุด (5)"},
+  {v:"4", label:"มาก (4)"},
+  {v:"3", label:"ปานกลาง (3)"},
+  {v:"2", label:"น้อย (2)"},
+  {v:"1", label:"น้อยที่สุด (1)"},
+  {v:"0", label:"ไม่พึงพอใจ (0)"},
+];
+const SCALE_COLS_OVERALL = [
+  {v:"5", label:"มากที่สุด (5)"},
+  {v:"4", label:"มาก (4)"},
+  {v:"3", label:"ปานกลาง (3)"},
+  {v:"2", label:"น้อย (2)"},
+  {v:"1", label:"น้อยที่สุด (1)"},
+  {v:"0", label:"ไม่พึงพอใจ (0)"},
+];
+
+const FACE_EMOJI = {5:'😄', 4:'🙂', 3:'😐', 2:'🙁', 1:'😞', 0:'😠'};
+
+const SECTION_THEMES = {
+  process: {color:'#C0392B', icon:'💬', title:'ขั้นตอน/กระบวนการให้บริการ ไม่ยุ่งยาก/ไม่ซับซ้อน มีความยืดหยุ่น/คล่องตัว สะดวก/รวดเร็ว เหมาะสมตามความต้องการของผู้รับบริการ'},
+  staff:   {color:'#2E9E5B', icon:'🎧', title:'เจ้าหน้าที่/บุคลากรผู้ให้บริการ สามารถตอบข้อซักถาม/อธิบาย แนะนำ ชี้แจงอย่างชัดเจน ช่วยเหลือ แก้ไขปัญหาได้'},
+  data:    {color:'#F8931D', icon:'📊', title:'ด้านคุณภาพของข้อมูลและระบบสารสนเทศ มีความครบถ้วนสมบูรณ์ ถูกต้อง เชื่อถือ ตรวจสอบได้ อัปเดตตามกำหนดเวลา/ทันต่อการใช้งาน'},
+  time:    {color:'#3B6FA0', icon:'⏱️', title:'ด้านระยะเวลา ให้บริการด้วยความสะดวก รวดเร็ว เหมาะสมต่อความต้องการของผู้รับบริการ'},
+};
+
+function buildDivider(containerId, themeKey, scaleCols){
+  const theme = SECTION_THEMES[themeKey];
+  const el = document.getElementById(containerId);
+  const scaleHtml = scaleCols.map(c=>{
+    const face = c.v==='never' ? '<span class="face-dot"></span>' : `<span class="face">${FACE_EMOJI[c.v]}</span>`;
+    return `<div class="scale-item">${face}<span class="face-label">${c.label}</span></div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="section-divider" style="--divider-color:${theme.color}">
+      <div class="divider-icon">${theme.icon}</div>
+      <div class="divider-title">${theme.title}</div>
+      <div class="divider-scale">${scaleHtml}</div>
+    </div>`;
+}
+
+function buildQuadDivider(containerId){
+  const el = document.getElementById(containerId);
+  const keys = ['process','staff','time','data'];
+  const labels = ['ด้านที่ 1 ขั้นตอน/กระบวนการ','ด้านที่ 2 เจ้าหน้าที่ผู้ให้บริการ','ด้านที่ 3 ระยะเวลา','ด้านที่ 4 คุณภาพงาน/ข้อมูล'];
+  el.innerHTML = `<div class="quad-divider">` + keys.map((k,i)=>{
+    const theme = SECTION_THEMES[k];
+    return `<div class="quad-item">
+      <div class="quad-icon" style="background:${theme.color}">${theme.icon}</div>
+      <div class="quad-label" style="color:${theme.color}">${labels[i]}</div>
+    </div>`;
+  }).join('') + `</div>`;
+}
+
+/* ---------- Render helpers ---------- */
+function buildRatingTable(tableId, items, scaleCols, groupName){
+  const t = document.getElementById(tableId);
+  let thead = '<thead><tr><th class="item-head">หัวข้องาน</th>' +
+    scaleCols.map(c=>`<th>${c.label}</th>`).join('') + '</tr></thead>';
+  let tbody = '<tbody>' + items.map(item=>{
+    const rowName = `${groupName}_${item.no}`;
+    const cells = scaleCols.map(c=>
+      `<td><input type="radio" name="${rowName}" value="${c.v}" required></td>`
+    ).join('');
+    return `<tr><td class="item-cell">${item.no}. ${item.desc}</td>${cells}</tr>`;
+  }).join('') + '</tbody>';
+  t.innerHTML = thead + tbody;
+}
+
+function buildRadioRow(containerId, name, options){
+  const el = document.getElementById(containerId);
+  el.innerHTML = options.map(o=>`
+    <label class="radio-opt" data-name="${name}">
+      <input type="radio" name="${name}" value="${o.v}" required>
+      <span>${o.t}</span>
+    </label>`).join('');
+}
+
+function buildSelect(selectEl, list){
+  list.forEach(([v,t])=>{
+    const opt = document.createElement('option');
+    opt.value = v; opt.textContent = t;
+    selectEl.appendChild(opt);
+  });
+}
+
+function buildScore10(){
+  const el = document.getElementById('score10Row');
+  let html = '';
+  for(let i=1;i<=10;i++){
+    html += `<label class="score10-opt" data-name="score10">
+      <input type="radio" name="score10" value="${i}" required>${i}
+    </label>`;
+  }
+  el.innerHTML = html;
+}
+
+/* build everything */
+buildRadioRow('statusOptions','status',STATUS_OPTIONS);
+buildRadioRow('freqOptions','freq',FREQ_OPTIONS);
+buildScore10();
+buildSelect(document.getElementById('affilMain'), LIST_A);
+buildSelect(document.getElementById('affilOP'), LIST_B);
+buildSelect(document.getElementById('affilInhouse'), LIST_C);
+buildDivider('divider-process', 'process', SCALE_COLS_USE);
+buildRatingTable('table-process', PROCESS_STAFF_ITEMS, SCALE_COLS_USE, 'process');
+buildDivider('divider-staff', 'staff', SCALE_COLS_USE);
+buildRatingTable('table-staff', PROCESS_STAFF_ITEMS, SCALE_COLS_USE, 'staff');
+buildDivider('divider-data', 'data', SCALE_COLS_DATA);
+buildRatingTable('table-data', DATA_QUALITY_ITEMS, SCALE_COLS_DATA, 'data');
+buildQuadDivider('divider-quad');
+buildRatingTable('table-overall-dims', OVERALL_DIMS.map((d,i)=>({no:i+1,desc:d.label})), SCALE_COLS_OVERALL, 'overalldim');
+
+/* visual feedback: highlight checked radio-opt / score10-opt */
+document.body.addEventListener('change', (e)=>{
+  if(e.target.type==='radio'){
+    const name = e.target.name;
+    document.querySelectorAll(`[data-name="${name}"]`).forEach(l=>l.classList.remove('checked'));
+    const wrap = e.target.closest('.radio-opt, .score10-opt');
+    if(wrap) wrap.classList.add('checked');
+  }
+});
+
+/* conditional affiliation logic */
+const affilMain = document.getElementById('affilMain');
+const affilOPWrap = document.getElementById('affilOPWrap');
+const affilInhouseWrap = document.getElementById('affilInhouseWrap');
+const affilOP = document.getElementById('affilOP');
+const affilInhouse = document.getElementById('affilInhouse');
+affilMain.addEventListener('change', ()=>{
+  affilOPWrap.classList.toggle('hidden', affilMain.value !== 'OP');
+  affilInhouseWrap.classList.toggle('hidden', affilMain.value !== 'INHOUSE');
+  affilOP.required = affilMain.value === 'OP';
+  affilInhouse.required = affilMain.value === 'INHOUSE';
+});
+
+/* skip logic: executive respondents skip section 1 details + go straight from status to section2 */
+const affiliationBlock = document.getElementById('affiliationBlock');
+document.getElementById('statusOptions').addEventListener('change', (e)=>{
+  if(e.target.name==='status'){
+    const isExec = e.target.value === 'exec_univ';
+    affiliationBlock.classList.toggle('hidden', isExec);
+    affilMain.required = !isExec;
+  }
+});
+
+/* steps nav */
+const STEP_IDS = ['sec-intro','sec-1','sec-2','sec-3','sec-4','sec-5'];
+const STEP_LABELS = ['เริ่มต้น','ส่วนที่ 1','ส่วนที่ 2','ส่วนที่ 3','ส่วนที่ 4','ส่วนที่ 5'];
+const stepsNav = document.getElementById('stepsNav');
+STEP_IDS.forEach((id,i)=>{
+  const b = document.createElement('button');
+  b.type='button'; b.className='step-btn'; b.textContent = STEP_LABELS[i];
+  b.addEventListener('click', ()=>document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'}));
+  stepsNav.appendChild(b);
+});
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const idx = STEP_IDS.indexOf(entry.target.id);
+      document.querySelectorAll('.step-btn').forEach((b,i)=>b.classList.toggle('active', i===idx));
+    }
+  });
+}, {rootMargin:'-160px 0px -60% 0px'});
+STEP_IDS.forEach(id=>observer.observe(document.getElementById(id)));
+
+document.getElementById('scrollTopBtn').addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+document.getElementById('privacyToggleBtn').addEventListener('click', ()=>{
+  const detail = document.getElementById('privacyDetail');
+  const btn = document.getElementById('privacyToggleBtn');
+  const isOpen = detail.style.display === 'block';
+  detail.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? 'ดูรายละเอียดเพิ่มเติม ▾' : 'ซ่อนรายละเอียด ▴';
+});
+
+/* ---------- Submit handling ---------- */
+function collectRadioGroup(name){
+  const checked = document.querySelector(`input[name="${name}"]:checked`);
+  return checked ? checked.value : null;
+}
+
+function gatherPayload(){
+  const status = collectRadioGroup('status');
+  const isExec = status === 'exec_univ';
+
+  const process = {};
+  PROCESS_STAFF_ITEMS.forEach(it=>{ process[it.no] = collectRadioGroup(`process_${it.no}`); });
+  const staff = {};
+  PROCESS_STAFF_ITEMS.forEach(it=>{ staff[it.no] = collectRadioGroup(`staff_${it.no}`); });
+  const dataQ = {};
+  DATA_QUALITY_ITEMS.forEach(it=>{ dataQ[it.no] = collectRadioGroup(`data_${it.no}`); });
+  const overallDims = {};
+  OVERALL_DIMS.forEach((d,i)=>{ overallDims[d.key] = collectRadioGroup(`overalldim_${i+1}`); });
+
+  return {
+    id: 'r' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+    submittedAt: new Date().toISOString(),
+    fiscalYear: document.getElementById('fiscalYear').value,
+    part1: {
+      status,
+      affilMain: isExec ? null : (affilMain.value || null),
+      affilOP: (!isExec && affilMain.value==='OP') ? affilOP.value : null,
+      affilInhouse: (!isExec && affilMain.value==='INHOUSE') ? affilInhouse.value : null,
+    },
+    part2: isExec ? {} : process,
+    feedback2: isExec ? '' : document.getElementById('fb-process').value.trim(),
+    part3: isExec ? {} : staff,
+    feedback3: isExec ? '' : document.getElementById('fb-staff').value.trim(),
+    part4: isExec ? {} : dataQ,
+    feedback4: isExec ? '' : document.getElementById('fb-data').value.trim(),
+    part5: {
+      freq: collectRadioGroup('freq'),
+      score10: collectRadioGroup('score10'),
+      dims: overallDims,
+      impressed: document.getElementById('fb-impressed').value.trim(),
+      suggestions: document.getElementById('fb-suggest').value.trim(),
+      commsSuggestions: document.getElementById('fb-comms').value.trim(),
+    }
+  };
+}
+
+function validateForm(payload){
+  const errors = [];
+  if(!document.getElementById('consentCheck').checked){
+    errors.push('กรุณายืนยันการรับทราบและยินยอมตามประกาศเกี่ยวกับข้อมูลส่วนบุคคล (ด้านบนสุดของแบบฟอร์ม)');
+  }
+  if(!payload.part1.status) errors.push('กรุณาเลือกสถานภาพผู้ประเมิน (ส่วนที่ 1)');
+  const isExec = payload.part1.status === 'exec_univ';
+  if(!isExec){
+    if(!payload.part1.affilMain) errors.push('กรุณาเลือกสังกัดหน่วยงาน (ส่วนที่ 1 ข้อ 2)');
+    if(payload.part1.affilMain==='OP' && !payload.part1.affilOP) errors.push('กรุณาเลือกสังกัดหน่วยงานภายใต้สำนักงานอธิการบดี (ส่วนที่ 1 ข้อ 3)');
+    if(payload.part1.affilMain==='INHOUSE' && !payload.part1.affilInhouse) errors.push('กรุณาเลือกสังกัดหน่วยงานในกำกับ (ส่วนที่ 1 ข้อ 4)');
+    PROCESS_STAFF_ITEMS.forEach(it=>{
+      if(!payload.part2[it.no]) errors.push(`กรุณาประเมินข้อ ${it.no} ในส่วนที่ 2`);
+    });
+    PROCESS_STAFF_ITEMS.forEach(it=>{
+      if(!payload.part3[it.no]) errors.push(`กรุณาประเมินข้อ ${it.no} ในส่วนที่ 3`);
+    });
+    DATA_QUALITY_ITEMS.forEach(it=>{
+      if(!payload.part4[it.no]) errors.push(`กรุณาประเมินข้อ ${it.no} ในส่วนที่ 4`);
+    });
+  }
+  if(!payload.part5.freq) errors.push('กรุณาเลือกความถี่การใช้บริการ (ส่วนที่ 5 ข้อ 1)');
+  if(!payload.part5.score10) errors.push('กรุณาให้คะแนนภาพรวม (ส่วนที่ 5 ข้อ 2)');
+  OVERALL_DIMS.forEach(d=>{
+    if(!payload.part5.dims[d.key]) errors.push(`กรุณาประเมิน "${d.label}" (ส่วนที่ 5 ข้อ 3)`);
+  });
+  if(!payload.part5.impressed) errors.push('กรุณากรอกสิ่งที่ท่านประทับใจ (ส่วนที่ 5 ข้อ 4) — ถ้าไม่มี ใส่ "-"');
+  if(!payload.part5.suggestions) errors.push('กรุณากรอกข้อเสนอแนะ (ส่วนที่ 5 ข้อ 5) — ถ้าไม่มี ใส่ "-"');
+  if(!payload.part5.commsSuggestions) errors.push('กรุณากรอกข้อเสนอแนะด้านการสื่อสาร (ส่วนที่ 5 ข้อ 6) — ถ้าไม่มี ใส่ "-"');
+  return errors;
+}
+
+document.getElementById('surveyForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const payload = gatherPayload();
+  const errors = validateForm(payload);
+  const errBanner = document.getElementById('errorBanner');
+
+  if(errors.length){
+    errBanner.style.display = 'block';
+    errBanner.innerHTML = '<strong>กรุณาตรวจสอบข้อมูลก่อนส่ง:</strong><br>' + errors.slice(0,6).map(x=>'• '+x).join('<br>') +
+      (errors.length>6 ? `<br>...และอีก ${errors.length-6} จุด` : '');
+    errBanner.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  errBanner.style.display = 'none';
+
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'กำลังส่ง...';
+
+  try{
+    const key = `stgsat_response:${payload.fiscalYear}:${payload.id}`;
+    const result = await window.storage.set(key, JSON.stringify(payload), true);
+    if(!result){
+      throw new Error('บันทึกไม่สำเร็จ');
+    }
+    document.getElementById('surveyForm').classList.add('hidden');
+    document.querySelector('header .steps').classList.add('hidden');
+    document.getElementById('thankyouBlock').classList.remove('hidden');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }catch(err){
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'ส่งแบบสำรวจ';
+    errBanner.style.display = 'block';
+    errBanner.innerHTML = '<strong>เกิดข้อผิดพลาดในการบันทึกข้อมูล</strong><br>โปรดลองใหม่อีกครั้ง หากยังไม่สำเร็จ โปรดแจ้งผู้ดูแลระบบ (' + (err && err.message ? err.message : 'unknown error') + ')';
+    errBanner.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+});
+
+document.getElementById('fiscalYear').addEventListener('change', ()=>{
+  document.getElementById('periodLabel').textContent =
+    `ประจำปีงบประมาณ ${document.getElementById('fiscalYear').value} (ประเมินภาพรวมทั้งปี) — ระยะเวลาดำเนินการ 1-31 ตุลาคม`;
+});
+
+/* ---------- Read admin fiscal-year lock config (set from the results dashboard) ---------- */
+(async function loadFiscalYearLock(){
+  try{
+    const result = await window.storage.get('stgsat_config', true);
+    if(!result || !result.value) return;
+    const config = JSON.parse(result.value);
+    if(config && config.activeFiscalYear){
+      const sel = document.getElementById('fiscalYear');
+      sel.value = config.activeFiscalYear;
+      sel.disabled = true;
+      document.getElementById('yearLockNote').style.display = 'block';
+      document.getElementById('periodLabel').textContent =
+        `ประจำปีงบประมาณ ${config.activeFiscalYear} (ประเมินภาพรวมทั้งปี) — ระยะเวลาดำเนินการ 1-31 ตุลาคม`;
+    }
+  }catch(err){
+    /* no config set yet — leave the dropdown open for manual selection */
+  }
+})();
+
+</script>
+</body>
+</html>

@@ -77,6 +77,16 @@
     padding:5px 12px;
     border-radius:100px;
   }
+  .header-links{margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;}
+  .header-links a{
+    font-size:13px;
+    color:#C8D3DE;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  .header-links a:hover{color:#fff;}
   .toolbar{
     max-width:1280px;
     margin:0 auto;
@@ -432,6 +442,10 @@
   <h1>คลังบริการ สำนักงานยุทธศาสตร์</h1>
   <div class="sub">รวมภารกิจ/บริการทั้งหมด 29 รายการ พร้อมช่วงเวลาดำเนินการ กำหนดการ และทีมที่รับผิดชอบ — คลิกที่การ์ดเพื่อดูรายละเอียดแต่ละบริการ</div>
   <div class="today-chip" id="todayChip">●</div>
+  <div class="header-links">
+    <a href="STG_Satisfaction_Survey.html">📋 แบบสำรวจความพึงพอใจ →</a>
+    <a href="STG_Satisfaction_Dashboard.html">📊 ผลสำรวจ (Dashboard) →</a>
+  </div>
 </header>
 
 <div class="toolbar">
@@ -536,13 +550,8 @@ const RECIP_DEFS = {
 
 const MONTH_NAMES = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
-// วันที่ปัจจุบันจริง อิงเวลาไทย (Asia/Bangkok) เสมอ ไม่ผูกกับ timezone ของเครื่องผู้ใช้
-const TODAY = (function(){
-  const p = new Intl.DateTimeFormat('en-CA',{
-    timeZone:'Asia/Bangkok', year:'numeric', month:'2-digit', day:'2-digit'
-  }).format(new Date()).split('-').map(Number);
-  return new Date(p[0], p[1]-1, p[2]);
-})();
+// "today" fixed per conversation context
+const TODAY = new Date(2026,7,3); // Aug 3, 2026
 const CUR_M = TODAY.getMonth(); // 0-indexed
 
 document.getElementById('todayChip').textContent =
