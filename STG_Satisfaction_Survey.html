@@ -353,6 +353,30 @@
 </main>
 
 <script>
+/* ==================================================================
+   Google Apps Script Web App backend — replace with your deployed URL.
+   See the "Google Apps Script setup" section in README.md for how to
+   create and deploy this (Deploy > New deployment > Web app > Execute
+   as Me > Who has access: Anyone).
+   ================================================================== */
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID_HERE/exec";
+
+async function apiPost(payload){
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'}, // avoids CORS preflight (Apps Script can't handle OPTIONS)
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('เครือข่ายขัดข้อง (HTTP ' + res.status + ')');
+  return await res.json();
+}
+async function apiGet(params){
+  const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+  const res = await fetch(APPS_SCRIPT_URL + qs);
+  if(!res.ok) throw new Error('เครือข่ายขัดข้อง (HTTP ' + res.status + ')');
+  return await res.json();
+}
+
 /* ---------- Reference data ---------- */
 const PROCESS_STAFF_ITEMS = [
  {no:1,  desc:"การสื่อสาร/การขับเคลื่อนแผนกลยุทธ์ มจธ. ฉบับที่ 13"},
@@ -699,10 +723,9 @@ document.getElementById('surveyForm').addEventListener('submit', async (e)=>{
   submitBtn.textContent = 'กำลังส่ง...';
 
   try{
-    const key = `stgsat_response:${payload.fiscalYear}:${payload.id}`;
-    const result = await window.storage.set(key, JSON.stringify(payload), true);
-    if(!result){
-      throw new Error('บันทึกไม่สำเร็จ');
+    const result = await apiPost({type:'response', data: payload});
+    if(!result || !result.ok){
+      throw new Error((result && result.error) || 'บันทึกไม่สำเร็จ');
     }
     document.getElementById('surveyForm').classList.add('hidden');
     document.querySelector('header .steps').classList.add('hidden');
@@ -725,9 +748,7 @@ document.getElementById('fiscalYear').addEventListener('change', ()=>{
 /* ---------- Read admin fiscal-year lock config (set from the results dashboard) ---------- */
 (async function loadFiscalYearLock(){
   try{
-    const result = await window.storage.get('stgsat_config', true);
-    if(!result || !result.value) return;
-    const config = JSON.parse(result.value);
+    const config = await apiGet({action:'getConfig'});
     if(config && config.activeFiscalYear){
       const sel = document.getElementById('fiscalYear');
       sel.value = config.activeFiscalYear;
@@ -737,7 +758,7 @@ document.getElementById('fiscalYear').addEventListener('change', ()=>{
         `ประจำปีงบประมาณ ${config.activeFiscalYear} (ประเมินภาพรวมทั้งปี) — ระยะเวลาดำเนินการ 1-31 ตุลาคม`;
     }
   }catch(err){
-    /* no config set yet — leave the dropdown open for manual selection */
+    /* backend not reachable yet / no config set — leave the dropdown open for manual selection */
   }
 })();
 
