@@ -550,8 +550,18 @@ const RECIP_DEFS = {
 
 const MONTH_NAMES = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
-// "today" fixed per conversation context
-const TODAY = new Date(2026,7,3); // Aug 3, 2026
+// Always resolve "today" as the current date in Thailand (Asia/Bangkok),
+// regardless of the viewer's device timezone setting.
+function getBangkokNow(){
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric', month: 'numeric', day: 'numeric'
+  }).formatToParts(new Date());
+  const map = {};
+  parts.forEach(p => { if(p.type !== 'literal') map[p.type] = parseInt(p.value, 10); });
+  return new Date(map.year, map.month - 1, map.day);
+}
+const TODAY = getBangkokNow();
 const CUR_M = TODAY.getMonth(); // 0-indexed
 
 document.getElementById('todayChip').textContent =
