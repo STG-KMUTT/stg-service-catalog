@@ -9,6 +9,7 @@
 | `index.html` | **คลังบริการ** — 29 ภารกิจ/บริการ พร้อมไทม์ไลน์รายเดือนและมุมมอง Gantt (หน้าแรกของเว็บไซต์) |
 | `STG_Satisfaction_Survey.html` | **แบบสำรวจความพึงพอใจ** — แบบฟอร์มเก็บข้อมูลรายปีงบประมาณ ครบ 5 ส่วนตาม STGSAT25 |
 | `STG_Satisfaction_Dashboard.html` | **Dashboard ผลสำรวจ** — ต้อง login (รหัสผ่านร่วม) ดูสรุปคะแนน แยกตามหัวข้องาน/กลุ่มงาน พร้อมดาวน์โหลด CSV |
+| `Code.gs` | **Backend** — วางในโปรเจกต์ Google Apps Script ที่ผูกกับ Google Sheet (ไม่ได้อัปโหลดขึ้น GitHub Pages) |
 
 ทั้ง 3 หน้ามีลิงก์เชื่อมถึงกันในส่วนหัว เปิดใช้งานได้ทันทีเมื่ออัปโหลดไว้ในโฟลเดอร์เดียวกัน
 
@@ -47,11 +48,10 @@
 ครบ 5 ส่วนตามแบบสำรวจ STGSAT25 (V4): ข้อมูลทั่วไป, ขั้นตอน/กระบวนการ (19 รายการ), เจ้าหน้าที่/บุคลากร (19 รายการ),
 คุณภาพข้อมูล+ระบบสารสนเทศ (11 รายการ), และภาพรวมทั้งปี — มีประกาศ PDPA + checkbox ยินยอมก่อนตอบแบบสำรวจ
 
-คำตอบจะถูกบันทึกผ่าน Claude Artifacts persistent storage (`window.storage`) แบบ shared
+คำตอบจะถูกบันทึกผ่าน **Google Apps Script Web App + Google Sheet** แบบเรียลไทม์
 ผูกกับ "รอบปีงบประมาณ" ที่เลือก — **ปีงบประมาณจะถูกล็อกอัตโนมัติถ้าผู้ดูแลตั้งค่าไว้จาก Dashboard**
 
-> ⚠️ ไฟล์นี้พึ่งพา `window.storage` ซึ่งใช้งานได้เฉพาะเมื่อเปิดผ่าน Claude Artifacts environment
-> หากนำไปโฮสต์บน GitHub Pages ตรง ๆ ฟังก์ชันบันทึกข้อมูลจะไม่ทำงาน (ดูหัวข้อ "ข้อจำกัดสำคัญ" ด้านล่าง)
+> ⚙️ ต้องตั้งค่า `APPS_SCRIPT_URL` ในไฟล์นี้ก่อนใช้งานจริง ดูหัวข้อ "Google Apps Script setup" ด้านล่าง
 
 ## Dashboard ผลสำรวจ (STG_Satisfaction_Dashboard.html)
 
@@ -67,16 +67,38 @@
 
 แก้ข้อมูลบริการได้ที่ตัวแปร `ITEMS` ในแท็ก `<script>` ของ `index.html`
 
-## ⚠️ ข้อจำกัดสำคัญ: window.storage บน GitHub Pages
+## Google Apps Script setup (ทำให้ใช้งานได้จริงบน GitHub Pages)
 
-`STG_Satisfaction_Survey.html` และ `STG_Satisfaction_Dashboard.html` ใช้ API ชื่อ `window.storage`
-ซึ่งเป็นฟีเจอร์เฉพาะของ **Claude Artifacts** (ใช้ได้เมื่อเปิดไฟล์ผ่านลิงก์ artifact ของ Claude เท่านั้น)
+`STG_Satisfaction_Survey.html` และ `STG_Satisfaction_Dashboard.html` ต่อกับ **Google Apps Script Web App**
+(แทน `window.storage` ของ Claude Artifacts เดิม) โดยเก็บข้อมูลลง Google Sheet — ใช้งานได้ทั้งบน GitHub Pages
+และเปิดจากเครื่องไหนก็ได้
 
-เมื่อนำไฟล์ไปโฮสต์บน **GitHub Pages ตรง ๆ** (เช่น `stg-kmutt.github.io/stg-service-catalog/`) `window.storage` จะไม่มีอยู่จริง
-ทำให้ **ส่งแบบสำรวจไม่ได้และ Dashboard จะไม่มีข้อมูลให้แสดง** ต้องแก้ไขอย่างใดอย่างหนึ่งก่อนใช้งานจริงบน GitHub Pages:
+### ขั้นตอนติดตั้ง
 
-1. **เก็บข้อมูลผ่าน Google Form/Google Sheets แทน** (แก้โค้ดส่วน submit ให้ยิง request ไปยัง Google Apps Script Web App หรือ Google Form แทน `window.storage.set`)
-2. **ใช้บริการ backend อื่น** เช่น Firebase, Supabase, หรือ Airtable API แล้วแก้โค้ดส่วนอ่าน/เขียนข้อมูลให้เรียก API นั้นแทน
-3. **เปิดใช้งานผ่านลิงก์ Claude Artifact เดิมต่อไป** (ไม่ต้องพึ่ง GitHub Pages สำหรับสองหน้านี้) แล้วใช้ GitHub Pages เฉพาะหน้า `index.html` (คลังบริการ) ซึ่งไม่พึ่งพา storage ใด ๆ
+1. สร้าง Google Sheet ใหม่ 1 ไฟล์ (ชื่ออะไรก็ได้ เช่น "STGSAT Responses") — นี่คือฐานข้อมูลของระบบ
+2. เมนู **Extensions > Apps Script**
+3. ลบโค้ดเริ่มต้นในไฟล์ `Code.gs` ออกทั้งหมด แล้ววางเนื้อหาจากไฟล์ `Code.gs` ที่แนบมาด้วยแทน
+4. กด **Deploy > New deployment** เลือกประเภท **Web app**
+   - **Execute as:** Me
+   - **Who has access:** Anyone
+5. กด Deploy แล้วคัดลอก **Web app URL** ที่ได้ (รูปแบบ `https://script.google.com/macros/s/XXXXX/exec`)
+6. เปิดไฟล์ `STG_Satisfaction_Survey.html` และ `STG_Satisfaction_Dashboard.html` ด้วยโปรแกรมแก้ไขข้อความ
+   ค้นหาบรรทัด `const APPS_SCRIPT_URL = "..."` แล้ว**แทนที่ด้วย URL ที่คัดลอกมาทั้งสองไฟล์**
+7. อัปโหลดไฟล์ทั้งหมด (รวมทั้งไฟล์ที่แก้ URL แล้ว) ขึ้น GitHub ตามปกติ
 
-หากต้องการให้ช่วยแก้เป็นแบบใดแบบหนึ่งข้างต้น แจ้งได้เลยครับ
+> ⚠️ ทุกครั้งที่แก้โค้ดใน `Code.gs` ต้องกด **Deploy > Manage deployments > แก้ไข (ไอคอนดินสอ) > Deploy** ใหม่
+> ไม่งั้น Web app URL เดิมจะยังรันโค้ดเวอร์ชันเก่าอยู่ (การกด "Save" ในหน้าแก้โค้ดอย่างเดียวไม่พอ)
+
+### โครงสร้างข้อมูลใน Google Sheet
+
+ระบบจะสร้าง 2 ชีตให้อัตโนมัติเมื่อมีการใช้งานครั้งแรก:
+- **Responses** — แถวละ 1 คำตอบ (id, submittedAt, fiscalYear, payloadJson แบบ JSON เต็ม)
+- **Config** — เก็บค่าตั้งค่า เช่น `activeFiscalYear` (ปีที่ล็อกไว้สำหรับแบบฟอร์ม)
+
+ต้องการดูข้อมูลดิบ เปิด Google Sheet ได้โดยตรง หรือกด "ดาวน์โหลด CSV" จาก Dashboard ก็ได้เหมือนเดิม
+
+### ทดสอบว่าเชื่อมต่อสำเร็จ
+
+เปิด `STG_Satisfaction_Dashboard.html` แล้ว login — ถ้าเชื่อมต่อไม่สำเร็จจะมีข้อความแจ้งเตือนสีเหลืองบอกให้ตรวจสอบ
+`APPS_SCRIPT_URL` และสิทธิ์ "Who has access: Anyone" ให้ถูกต้อง
+
