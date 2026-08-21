@@ -219,6 +219,28 @@
    ================================================================== */
 const DASHBOARD_PASSWORD = "STG2569";
 
+/* ==================================================================
+   Google Apps Script Web App backend — must match the URL used in
+   STG_Satisfaction_Survey.html. See README.md "Google Apps Script setup".
+   ================================================================== */
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID_HERE/exec";
+
+async function apiPost(payload){
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('เครือข่ายขัดข้อง (HTTP ' + res.status + ')');
+  return await res.json();
+}
+async function apiGet(params){
+  const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+  const res = await fetch(APPS_SCRIPT_URL + qs);
+  if(!res.ok) throw new Error('เครือข่ายขัดข้อง (HTTP ' + res.status + ')');
+  return await res.json();
+}
+
 const PROCESS_STAFF_ITEMS = [
  {no:1,  desc:"การสื่อสาร/การขับเคลื่อนแผนกลยุทธ์ มจธ. ฉบับที่ 13", tags:["PLAN"]},
  {no:2,  desc:"การจัดทำแผนปฏิบัติการ (Implementation Plan)", tags:["PLAN"]},
@@ -290,22 +312,14 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
 
 /* ---------------- Data loading ---------------- */
 async function loadAllResponses(){
-  const listResult = await window.storage.list('stgsat_response:', true);
-  const keys = (listResult && listResult.keys) || [];
-  const out = [];
-  for(const key of keys){
-    try{
-      const r = await window.storage.get(key, true);
-      if(r && r.value) out.push(JSON.parse(r.value));
-    }catch(e){ /* skip unreadable entries */ }
-  }
-  return out;
+  const data = await apiGet({action:'getResponses'});
+  return Array.isArray(data) ? data : [];
 }
 
 async function loadConfig(){
   try{
-    const r = await window.storage.get('stgsat_config', true);
-    return r && r.value ? JSON.parse(r.value) : null;
+    const cfg = await apiGet({action:'getConfig'});
+    return (cfg && cfg.activeFiscalYear) ? cfg : null;
   }catch(e){ return null; }
 }
 
@@ -318,7 +332,19 @@ function populateYearSelects(years){
 
 async function initDashboard(){
   document.getElementById('dataArea').innerHTML = '<div class="empty-note">กำลังโหลดข้อมูล...</div>';
-  ALL_RESPONSES = await loadAllResponses();
+
+  try{
+    ALL_RESPONSES = await loadAllResponses();
+  }catch(err){
+    document.getElementById('dataArea').innerHTML =
+      `<div class="card"><div class="empty-note">
+        ⚠️ เชื่อมต่อฐานข้อมูลไม่สำเร็จ<br><br>
+        ตรวจสอบว่าได้ตั้งค่า <code>APPS_SCRIPT_URL</code> ในไฟล์นี้ให้ตรงกับ URL ที่ deploy จาก Google Apps Script แล้ว
+        และ deploy ด้วยสิทธิ์ "Who has access: Anyone"<br><br>
+        <span style="font-size:11px;color:var(--mute);">รายละเอียด: ${err.message}</span>
+      </div></div>`;
+    return;
+  }
 
   const years = Array.from(new Set(ALL_RESPONSES.map(r=>r.fiscalYear))).sort();
   populateYearSelects(years);
@@ -349,10 +375,11 @@ document.getElementById('saveLockBtn').addEventListener('click', async ()=>{
   const btn = document.getElementById('saveLockBtn');
   btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
   try{
-    await window.storage.set('stgsat_config', JSON.stringify({activeFiscalYear:y}), true);
+    const result = await apiPost({type:'setConfig', data:{activeFiscalYear:y}});
+    if(!result || !result.ok) throw new Error((result && result.error) || 'unknown error');
     document.getElementById('currentLockBadge').textContent = `🔒 ล็อกไว้ที่ปี ${y}`;
   }catch(e){
-    alert('บันทึกไม่สำเร็จ โปรดลองใหม่อีกครั้ง');
+    alert('บันทึกไม่สำเร็จ โปรดลองใหม่อีกครั้ง (' + e.message + ')');
   }
   btn.disabled = false; btn.textContent = 'บันทึกการตั้งค่า';
 });
